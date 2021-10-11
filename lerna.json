@@ -3,6 +3,6 @@
   "npmClient": "yarn",
   "packages": [
     "packages/*",
-    "examples/@(default-theme|e-commerce|media|tourism|hooks)"
+    "examples/@(default-theme|e-commerce|media|tourism|hooks|hooks-next|hooks-server-side-rendering)"
   ]
 }

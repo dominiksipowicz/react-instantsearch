@@ -4,12 +4,14 @@
   "license": "MIT",
   "workspaces": [
     "packages/*",
-    "examples/@(default-theme|e-commerce|media|tourism|hooks)"
+    "examples/@(default-theme|e-commerce|media|tourism|hooks|hooks-next|hooks-server-side-rendering)"
   ],
   "scripts": {
     "postinstall": "lerna run build:cjs --scope react-instantsearch-*",
     "start": "yarn storybook",
     "build": "lerna run build --scope react-*",
+    "build:cjs": "lerna run build:cjs --scope react-*",
+    "build:es": "lerna run build:es --scope react-*",
     "watch": "lerna run watch --scope react-instantsearch-* --parallel",
     "release": "shipjs prepare",
     "lint": "eslint --ext .js,.ts,.tsx .",

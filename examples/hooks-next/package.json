@@ -1,0 +1,18 @@
+{
+  "name": "hooks-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "algoliasearch": "4.10.5",
+    "next": "11.1.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-instantsearch-hooks": "6.15.0"
+  }
+}
