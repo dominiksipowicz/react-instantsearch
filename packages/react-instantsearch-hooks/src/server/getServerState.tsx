@@ -10,7 +10,6 @@ import type {
 } from '../InstantSearchServerContext';
 import type { InstantSearchServerState } from '../InstantSearchSSRContext';
 import type { InitialResults } from '../useInstantSearch';
-import type { SearchResults } from 'algoliasearch-helper';
 import type { InstantSearch } from 'instantsearch.js';
 import type { IndexWidget } from 'instantsearch.js/es/widgets/index/index';
 import type { ReactNode } from 'react';
@@ -42,7 +41,7 @@ export async function getServerState(
   // wasn't within the `children`.
   if (!ssrClient.search) {
     throw new Error(
-      'Unable to get <InstantSearch> server state in `getServerState()`.'
+      "Unable to retrieve InstantSearch's server state in `getServerState()`. Did you mount the <InstantSearch> component?"
     );
   }
 
@@ -50,15 +49,7 @@ export async function getServerState(
 
   await waitForResults(search);
 
-  const initialResults: InitialResults = reduceIndex<SearchResults>(
-    search.mainIndex,
-    (acc, indexWidget) => {
-      return {
-        ...acc,
-        [indexWidget.getIndexId()]: indexWidget.getResults()!,
-      };
-    }
-  );
+  const initialResults = getInitialResults(search.mainIndex);
 
   return {
     initialResults,
@@ -91,21 +82,28 @@ function waitForResults(search: InstantSearch) {
   });
 }
 
-/**
- * Applies a reduce function on the index widgets of the widgets tree.
- */
-function reduceIndex<TValue>(
-  indexWidget: IndexWidget,
-  callback: (
-    acc: Record<string, TValue>,
-    widget: IndexWidget
-  ) => Record<string, TValue>
-) {
-  return indexWidget.getWidgets().reduce((acc, widget) => {
-    if (!isIndexWidget(widget)) {
-      return acc;
-    }
+function getInitialResults(rootIndex: IndexWidget): InitialResults {
+  function walkIndex(
+    indexWidget: IndexWidget,
+    callback: (widget: IndexWidget) => void
+  ) {
+    callback(indexWidget);
 
-    return callback(acc, widget);
-  }, callback({}, indexWidget));
+    return indexWidget.getWidgets().forEach((widget) => {
+      if (!isIndexWidget(widget)) {
+        return;
+      }
+
+      callback(widget);
+      walkIndex(widget, callback);
+    });
+  }
+
+  const initialResults: InitialResults = {};
+
+  walkIndex(rootIndex, (widget) => {
+    initialResults[widget.getIndexId()] = widget.getResults();
+  });
+
+  return initialResults;
 }

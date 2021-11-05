@@ -1,10 +1,12 @@
 import index from 'instantsearch.js/es/widgets/index/index';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { useForceUpdate } from './useForceUpdate';
 import { useIndexContext } from './useIndexContext';
 import { useInstantSearchServerContext } from './useInstantSearchServerContext';
+import { useInstantSearchSsrContext } from './useInstantSearchSsrContext';
 import { useStableValue } from './useStableValue';
+import { useIsomorphicLayoutEffect } from './utils';
 
 import type { IndexWidgetParams } from 'instantsearch.js/es/widgets/index/index';
 
@@ -12,9 +14,32 @@ export type UseIndexProps = IndexWidgetParams;
 
 export function useIndex(props: UseIndexProps) {
   const serverContext = useInstantSearchServerContext();
+  const ssrContext = useInstantSearchSsrContext();
   const parentIndex = useIndexContext();
   const stableProps = useStableValue(props);
-  const indexWidget = useMemo(() => index(stableProps), [stableProps]);
+  // On SSR rendering, we add the Index early in a memo to render the initial
+  // results in the render pass. Since the Index is added already, we need to
+  // skip the usual browser effect that adds the widget when client-side
+  // rendering. We still need to run the effect lifecycle on all the other renders.
+  // This ref lets us keep track whether the initial effect to add the Index
+  // should be skipped.
+  const shouldAddIndexRef = useRef(true);
+  const indexWidget = useMemo(() => {
+    const instance = index(stableProps);
+
+    // On the server, we directly add the Index in the memo scope to retrieve
+    // its child widgets' search parameters in the render pass.
+    // On SSR, we also add the Index here to synchronize the search state associated
+    // to the widgets.
+    // In these environments, we flag that we've added the widgets early to skip
+    // the initial browser effect that would otherwise add the Index another time.
+    if (serverContext || ssrContext?.initialResults) {
+      parentIndex.addWidgets([instance]);
+      shouldAddIndexRef.current = false;
+    }
+
+    return instance;
+  }, [parentIndex, serverContext, ssrContext?.initialResults, stableProps]);
   const helper = indexWidget.getHelper();
   const forceUpdate = useForceUpdate();
 
@@ -22,22 +47,16 @@ export function useIndex(props: UseIndexProps) {
     forceUpdate();
   }, [helper, forceUpdate]);
 
-  useEffect(() => {
-    parentIndex.addWidgets([indexWidget]);
+  useIsomorphicLayoutEffect(() => {
+    if (shouldAddIndexRef.current) {
+      parentIndex.addWidgets([indexWidget]);
+    }
 
     return () => {
       parentIndex.removeWidgets([indexWidget]);
+      shouldAddIndexRef.current = true;
     };
   }, [parentIndex, indexWidget]);
-
-  // On the server, we directly add the index when rendering to be aware of
-  // its child widgets' search parameters.
-  // Although it's not recommended to trigger side effects in the render scope,
-  // it should be fine here because we use `renderToString` on the server, which
-  // renders in a single pass.
-  if (serverContext) {
-    parentIndex.addWidgets([indexWidget]);
-  }
 
   return indexWidget;
 }

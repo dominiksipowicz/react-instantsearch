@@ -26,6 +26,7 @@ server.get('/', async (req, res) => {
     <script>window.__APP_INITIAL_STATE__ = ${JSON.stringify(
       serverState
     )}</script>
+    <link href="https://cdn.jsdelivr.net/npm/instantsearch.css@7/themes/satellite.css" rel="stylesheet" />
   </head>
   
   <body>

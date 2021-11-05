@@ -1,10 +1,8 @@
-import { SearchParameters, SearchResults } from 'algoliasearch-helper';
 import { useMemo, useState } from 'react';
 
 import { useIndexContext } from './useIndexContext';
 import { useInstantSearchContext } from './useInstantSearchContext';
 import { useInstantSearchServerContext } from './useInstantSearchServerContext';
-import { useInstantSearchSsrContext } from './useInstantSearchSsrContext';
 import { useStableValue } from './useStableValue';
 import { useIsomorphicLayoutEffect } from './utils';
 import { createSearchResults } from './utils/createSearchResults';
@@ -19,7 +17,6 @@ export function useConnector<
   props: TProps = {} as TProps
 ): TDescription['renderState'] {
   const serverContext = useInstantSearchServerContext();
-  const ssrContext = useInstantSearchSsrContext();
   const search = useInstantSearchContext();
   const parentIndex = useIndexContext();
   const stableProps = useStableValue(props);
@@ -41,28 +38,23 @@ export function useConnector<
       setState(renderState);
     });
 
-    return createWidget(stableProps);
-  }, [stableProps, connector]);
+    const instance = createWidget(stableProps);
+
+    // On the server, we add the widget early in the memo to retrieve its search
+    // parameters in the render pass.
+    if (serverContext) {
+      parentIndex.addWidgets([instance]);
+    }
+
+    return instance;
+  }, [connector, parentIndex, serverContext, stableProps]);
 
   const [state, setState] = useState<TDescription['renderState']>(() => {
     if (widget.getWidgetRenderState) {
       // The helper exists because we've started InstantSearch.
       const helper = parentIndex.getHelper()!;
-      const results = ssrContext?.initialResults
-        ? new SearchResults(
-            new SearchParameters(
-              ssrContext.initialResults[parentIndex.getIndexId()]._state
-            ),
-            ssrContext.initialResults[parentIndex.getIndexId()]._rawResults
-          )
-        : parentIndex.getResults() || createSearchResults(helper.state);
-
-      // On SSR, we patch the injected Helper's state with the state from the
-      // results to sync its search parameters with the ones from the initial
-      // results.
-      if (ssrContext?.initialResults) {
-        helper.state = results._state;
-      }
+      const results =
+        parentIndex.getResults() || createSearchResults(helper.state);
 
       const scopedResults = parentIndex
         .getScopedResults()
@@ -74,7 +66,7 @@ export function useConnector<
 
           return {
             ...scopedResult,
-            // We avoid all `results` being `null`.
+            // We avoid all `results` to be `null`.
             results: scopedResult.results || fallbackResults,
           };
         });
@@ -103,8 +95,8 @@ export function useConnector<
     return {};
   });
 
-  // We use a layout effect to add the widget to the index at the same time as
-  // the index renders, otherwise it triggers 2 network requests.
+  // Using a layout effect adds the widget at the same time as rendering, which
+  // triggers a single network request, instead of two with as regular effect.
   useIsomorphicLayoutEffect(() => {
     parentIndex.addWidgets([widget]);
 
@@ -112,15 +104,6 @@ export function useConnector<
       parentIndex.removeWidgets([widget]);
     };
   }, [widget, parentIndex]);
-
-  // On the server, we directly add the widget when rendering to be aware of
-  // its search parameters.
-  // Although it's not recommended to trigger side effects in the render scope,
-  // it should be fine here because we use `renderToString` on the server, which
-  // renders in a single pass.
-  if (serverContext) {
-    parentIndex.addWidgets([widget]);
-  }
 
   return state;
 }

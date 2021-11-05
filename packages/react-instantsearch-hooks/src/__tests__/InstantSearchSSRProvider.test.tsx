@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { SearchParameters, SearchResults } from 'algoliasearch-helper';
 import { history } from 'instantsearch.js/es/lib/routers';
 import { simple } from 'instantsearch.js/es/lib/stateMappings';
 import React from 'react';
 
 import { createSearchClient } from '../../../../test/mock';
+import { wait } from '../../../../test/utils';
 import { InstantSearch } from '../InstantSearch';
 import { InstantSearchSSRProvider } from '../InstantSearchSSRProvider';
 import { useHits } from '../useHits';
@@ -77,7 +78,7 @@ describe('InstantSearchSSRProvider', () => {
     });
   });
 
-  test('with initialUiState provides the initial UI state to InstantSearch', async () => {
+  test('renders UI state with initialUiState', async () => {
     const searchClient = createSearchClient();
     const initialResults = {
       indexName: new SearchResults(new SearchParameters({ query: 'iphone' }), [
@@ -193,5 +194,35 @@ describe('InstantSearchSSRProvider', () => {
       expect(screen.queryAllByRole('heading')).toHaveLength(1);
       expect(screen.queryByRole('list')).toBeNull();
     });
+  });
+
+  test('does not trigger a network request with initialResults', async () => {
+    const searchClient = createSearchClient();
+    const initialResults = {
+      indexName: new SearchResults(new SearchParameters(), [
+        // @ts-ignore Result is not exhaustive
+        {
+          hits: [{ objectID: '1' }, { objectID: '2' }, { objectID: '3' }],
+        },
+      ]),
+    };
+
+    function App() {
+      return (
+        <InstantSearchSSRProvider initialResults={initialResults}>
+          <InstantSearch searchClient={searchClient} indexName="indexName">
+            <Hits />
+          </InstantSearch>
+        </InstantSearchSSRProvider>
+      );
+    }
+
+    act(() => {
+      render(<App />);
+    });
+
+    await wait(0);
+
+    expect(searchClient.search).toHaveBeenCalledTimes(0);
   });
 });

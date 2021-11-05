@@ -9,7 +9,7 @@ import { history } from 'instantsearch.js/es/lib/routers';
 
 import { searchClient } from './searchClient';
 
-import { SearchBox, Hits, RefinementList } from './components';
+import { Configure, SearchBox, Hits, RefinementList } from './components';
 
 function Hit({ hit }) {
   return (
@@ -40,6 +40,8 @@ function App({ serverState, location }) {
           }),
         }}
       >
+        <Configure hitsPerPage={5} />
+
         <div
           style={{
             display: 'grid',
@@ -61,7 +63,32 @@ function App({ serverState, location }) {
             <Hits hitComponent={Hit} />
 
             <Index indexName="instant_search_price_asc">
-              <Hits hitComponent={Hit} />
+              <div
+                style={{
+                  display: 'grid',
+                  alignItems: 'flex-start',
+                  gridTemplateColumns: '200px 1fr',
+                  gap: '0.5rem',
+                }}
+              >
+                <div>
+                  <RefinementList
+                    attribute="brand"
+                    searchable={true}
+                    searchablePlaceholder="Search brands"
+                    showMore={true}
+                  />
+                  <RefinementList
+                    attribute="categories"
+                    searchable={true}
+                    searchablePlaceholder="Search categories"
+                    showMore={true}
+                  />
+                </div>
+                <div style={{ display: 'grid', gap: '.5rem' }}>
+                  <Hits hitComponent={Hit} />
+                </div>
+              </div>
             </Index>
           </div>
         </div>

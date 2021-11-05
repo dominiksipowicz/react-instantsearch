@@ -49,6 +49,14 @@ function createTestEnvironment({ searchClient }: CreateTestEnvironmentProps) {
 
         <Index indexName="instant_search_price_asc">
           <Hits />
+
+          <Index indexName="instant_search_rating_desc">
+            <Hits />
+          </Index>
+        </Index>
+
+        <Index indexName="instant_search_price_desc">
+          <Hits />
         </Index>
       </InstantSearch>
     );
@@ -76,7 +84,7 @@ describe('getServerState', () => {
     await expect(
       getServerState(<App />)
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Unable to get <InstantSearch> server state in \`getServerState()\`."`
+      `"Unable to retrieve InstantSearch's server state in \`getServerState()\`. Did you mount the <InstantSearch> component?"`
     );
   });
 
@@ -181,6 +189,66 @@ describe('getServerState', () => {
           tagFilters: '',
         },
       },
+      {
+        indexName: 'instant_search_rating_desc',
+        params: {
+          facetFilters: [['brand:Apple']],
+          facets: ['brand'],
+          highlightPostTag: '__/ais-highlight__',
+          highlightPreTag: '__ais-highlight__',
+          maxValuesPerFacet: 10,
+          query: 'iphone',
+          tagFilters: '',
+        },
+      },
+      {
+        indexName: 'instant_search_rating_desc',
+        params: {
+          analytics: false,
+          attributesToHighlight: [],
+          attributesToRetrieve: [],
+          attributesToSnippet: [],
+          clickAnalytics: false,
+          facets: 'brand',
+          highlightPostTag: '__/ais-highlight__',
+          highlightPreTag: '__ais-highlight__',
+          hitsPerPage: 1,
+          maxValuesPerFacet: 10,
+          page: 0,
+          query: 'iphone',
+          tagFilters: '',
+        },
+      },
+      {
+        indexName: 'instant_search_price_desc',
+        params: {
+          facetFilters: [['brand:Apple']],
+          facets: ['brand'],
+          highlightPostTag: '__/ais-highlight__',
+          highlightPreTag: '__ais-highlight__',
+          maxValuesPerFacet: 10,
+          query: 'iphone',
+          tagFilters: '',
+        },
+      },
+      {
+        indexName: 'instant_search_price_desc',
+        params: {
+          analytics: false,
+          attributesToHighlight: [],
+          attributesToRetrieve: [],
+          attributesToSnippet: [],
+          clickAnalytics: false,
+          facets: 'brand',
+          highlightPostTag: '__/ais-highlight__',
+          highlightPreTag: '__ais-highlight__',
+          hitsPerPage: 1,
+          maxValuesPerFacet: 10,
+          page: 0,
+          query: 'iphone',
+          tagFilters: '',
+        },
+      },
     ]);
   });
 
@@ -190,6 +258,7 @@ describe('getServerState', () => {
 
     const serverState = await getServerState(<App />);
 
+    expect(Object.keys(serverState.initialResults)).toHaveLength(4);
     expect(serverState.initialResults).toMatchInlineSnapshot(`
 Object {
   "instant_search": SearchResults {
@@ -317,6 +386,138 @@ Object {
     "hits": Array [],
     "hitsPerPage": 20,
     "index": "instant_search_price_asc",
+    "nbHits": 0,
+    "nbPages": 0,
+    "page": 0,
+    "params": "maxValuesPerFacet=10&query=iphone&highlightPreTag=__ais-highlight__&highlightPostTag=__%2Fais-highlight__&facets=%5B%22brand%22%5D&tagFilters=&facetFilters=%5B%5B%22brand%3AApple%22%5D%5D",
+    "processingTimeMS": 0,
+    "query": "",
+  },
+  "instant_search_price_desc": SearchResults {
+    "_rawResults": Array [
+      Object {
+        "exhaustiveFacetsCount": true,
+        "exhaustiveNbHits": true,
+        "hits": Array [],
+        "hitsPerPage": 20,
+        "index": "instant_search_price_desc",
+        "nbHits": 0,
+        "nbPages": 0,
+        "page": 0,
+        "params": "maxValuesPerFacet=10&query=iphone&highlightPreTag=__ais-highlight__&highlightPostTag=__%2Fais-highlight__&facets=%5B%22brand%22%5D&tagFilters=&facetFilters=%5B%5B%22brand%3AApple%22%5D%5D",
+        "processingTimeMS": 0,
+        "query": "",
+      },
+      Object {
+        "exhaustiveFacetsCount": true,
+        "exhaustiveNbHits": true,
+        "hits": Array [],
+        "hitsPerPage": 20,
+        "index": "instant_search_price_desc",
+        "nbHits": 0,
+        "nbPages": 0,
+        "page": 0,
+        "params": "maxValuesPerFacet=10&query=iphone&highlightPreTag=__ais-highlight__&highlightPostTag=__%2Fais-highlight__&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=brand",
+        "processingTimeMS": 0,
+        "query": "",
+      },
+    ],
+    "_state": SearchParameters {
+      "disjunctiveFacets": Array [
+        "brand",
+      ],
+      "disjunctiveFacetsRefinements": Object {
+        "brand": Array [
+          "Apple",
+        ],
+      },
+      "facets": Array [],
+      "facetsExcludes": Object {},
+      "facetsRefinements": Object {},
+      "hierarchicalFacets": Array [],
+      "hierarchicalFacetsRefinements": Object {},
+      "highlightPostTag": "__/ais-highlight__",
+      "highlightPreTag": "__ais-highlight__",
+      "index": "instant_search_price_desc",
+      "maxValuesPerFacet": 10,
+      "numericRefinements": Object {},
+      "query": "iphone",
+      "tagRefinements": Array [],
+    },
+    "disjunctiveFacets": Array [],
+    "exhaustiveFacetsCount": true,
+    "exhaustiveNbHits": true,
+    "facets": Array [],
+    "hierarchicalFacets": Array [],
+    "hits": Array [],
+    "hitsPerPage": 20,
+    "index": "instant_search_price_desc",
+    "nbHits": 0,
+    "nbPages": 0,
+    "page": 0,
+    "params": "maxValuesPerFacet=10&query=iphone&highlightPreTag=__ais-highlight__&highlightPostTag=__%2Fais-highlight__&facets=%5B%22brand%22%5D&tagFilters=&facetFilters=%5B%5B%22brand%3AApple%22%5D%5D",
+    "processingTimeMS": 0,
+    "query": "",
+  },
+  "instant_search_rating_desc": SearchResults {
+    "_rawResults": Array [
+      Object {
+        "exhaustiveFacetsCount": true,
+        "exhaustiveNbHits": true,
+        "hits": Array [],
+        "hitsPerPage": 20,
+        "index": "instant_search_rating_desc",
+        "nbHits": 0,
+        "nbPages": 0,
+        "page": 0,
+        "params": "maxValuesPerFacet=10&query=iphone&highlightPreTag=__ais-highlight__&highlightPostTag=__%2Fais-highlight__&facets=%5B%22brand%22%5D&tagFilters=&facetFilters=%5B%5B%22brand%3AApple%22%5D%5D",
+        "processingTimeMS": 0,
+        "query": "",
+      },
+      Object {
+        "exhaustiveFacetsCount": true,
+        "exhaustiveNbHits": true,
+        "hits": Array [],
+        "hitsPerPage": 20,
+        "index": "instant_search_rating_desc",
+        "nbHits": 0,
+        "nbPages": 0,
+        "page": 0,
+        "params": "maxValuesPerFacet=10&query=iphone&highlightPreTag=__ais-highlight__&highlightPostTag=__%2Fais-highlight__&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=brand",
+        "processingTimeMS": 0,
+        "query": "",
+      },
+    ],
+    "_state": SearchParameters {
+      "disjunctiveFacets": Array [
+        "brand",
+      ],
+      "disjunctiveFacetsRefinements": Object {
+        "brand": Array [
+          "Apple",
+        ],
+      },
+      "facets": Array [],
+      "facetsExcludes": Object {},
+      "facetsRefinements": Object {},
+      "hierarchicalFacets": Array [],
+      "hierarchicalFacetsRefinements": Object {},
+      "highlightPostTag": "__/ais-highlight__",
+      "highlightPreTag": "__ais-highlight__",
+      "index": "instant_search_rating_desc",
+      "maxValuesPerFacet": 10,
+      "numericRefinements": Object {},
+      "query": "iphone",
+      "tagRefinements": Array [],
+    },
+    "disjunctiveFacets": Array [],
+    "exhaustiveFacetsCount": true,
+    "exhaustiveNbHits": true,
+    "facets": Array [],
+    "hierarchicalFacets": Array [],
+    "hits": Array [],
+    "hitsPerPage": 20,
+    "index": "instant_search_rating_desc",
     "nbHits": 0,
     "nbPages": 0,
     "page": 0,
