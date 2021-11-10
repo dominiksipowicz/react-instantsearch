@@ -2,7 +2,7 @@ import { join } from 'path';
 import express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { getServerState } from 'react-instantsearch-hooks';
+import { getServerState } from 'react-instantsearch-hooks-server';
 import App from './App';
 
 const server = express();

@@ -4,18 +4,22 @@
 
 import React, { version as ReactVersion } from 'react';
 
-import { createSearchClient } from '../../../../../test/mock';
-import { InstantSearch } from '../../InstantSearch';
-import { InstantSearchSSRProvider } from '../../InstantSearchSSRProvider';
-import { Index } from '../../SearchIndex';
-import { useHits } from '../../useHits';
-import { useRefinementList } from '../../useRefinementList';
-import { useSearchBox } from '../../useSearchBox';
-import version from '../../version';
+import { createSearchClient } from '../../../../test/mock';
+import {
+  InstantSearch,
+  InstantSearchSSRProvider,
+  Index,
+  useHits,
+  useRefinementList,
+  useSearchBox,
+  version,
+} from 'react-instantsearch-hooks';
 import { getServerState } from '../getServerState';
 
-import type { InstantSearchServerState } from '../../InstantSearchSSRContext';
-import type { UseRefinementListProps } from '../../useRefinementList';
+import type {
+  InstantSearchServerState,
+  UseRefinementListProps,
+} from 'react-instantsearch-hooks';
 import type { SearchClient } from 'algoliasearch/lite';
 
 type CreateTestEnvironmentProps = {

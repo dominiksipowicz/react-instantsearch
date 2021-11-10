@@ -2,14 +2,14 @@ import { isIndexWidget } from 'instantsearch.js/es/widgets/index/index';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 
-import { InstantSearchServerContext } from '../InstantSearchServerContext';
+import { InstantSearchServerContext } from 'react-instantsearch-hooks';
 
 import type {
   InstantSearchServerApi,
   InstantSearchSsrClient,
-} from '../InstantSearchServerContext';
-import type { InstantSearchServerState } from '../InstantSearchSSRContext';
-import type { InitialResults } from '../useInstantSearch';
+  InstantSearchServerState,
+  InitialResults,
+} from 'react-instantsearch-hooks';
 import type { InstantSearch } from 'instantsearch.js';
 import type { IndexWidget } from 'instantsearch.js/es/widgets/index/index';
 import type { ReactNode } from 'react';

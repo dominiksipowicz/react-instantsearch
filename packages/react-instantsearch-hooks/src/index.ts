@@ -1,8 +1,9 @@
 export { default as version } from './version';
+export * from './InitialResults';
 export * from './InstantSearch';
+export * from './InstantSearchServerContext';
 export * from './InstantSearchSSRProvider';
 export * from './SearchIndex';
-export * from './server';
 export * from './useConfigure';
 export * from './useConnector';
 export * from './useHits';

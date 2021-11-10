@@ -39,13 +39,14 @@ const plugins = [
 
 const createConfiguration = ({ name, minify = false } = {}) => ({
   input: 'src/index.ts',
-  external: ['react'],
+  external: ['react', 'react-dom'],
   output: {
     file: `dist/umd/ReactInstantSearch${name}${minify ? '.min' : ''}.js`,
     name: `ReactInstantSearch${name}`,
     format: 'umd',
     globals: {
       react: 'React',
+      'react-dom': 'ReactDOM',
     },
     banner: createBanner(name),
     sourcemap: true,
@@ -64,11 +65,11 @@ const createConfiguration = ({ name, minify = false } = {}) => ({
 
 export default [
   createConfiguration({
-    name: 'Hooks',
+    name: 'HooksServer',
   }),
 
   createConfiguration({
-    name: 'Hooks',
+    name: 'HooksServer',
     minify: true,
   }),
 ];

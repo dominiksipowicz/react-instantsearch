@@ -11,7 +11,6 @@ import version from './version';
 
 import type { InstantSearchServerApi } from './InstantSearchServerContext';
 import type { InstantSearchServerState } from './InstantSearchSSRContext';
-import type { SearchResults } from 'algoliasearch-helper';
 import type {
   InstantSearchOptions,
   InstantSearch,
@@ -23,8 +22,6 @@ const defaultUserAgents = [
   `react-instantsearch (${version})`,
   `react-instantsearch-hooks (${version})`,
 ];
-
-export type InitialResults = Record<string, SearchResults>;
 
 export type UseInstantSearchProps = InstantSearchOptions & {
   /**
