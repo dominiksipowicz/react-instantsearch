@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["react/next", "react-dom/next"],
     "target": "ESNEXT",
     "module": "es2015",
     "moduleResolution": "node",
