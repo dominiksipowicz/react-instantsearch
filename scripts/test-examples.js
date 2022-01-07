@@ -4,7 +4,7 @@ const execSync = require('child_process').execSync;
 const fs = require('fs');
 
 const examples = glob
-  .sync(path.join(__dirname, '..', 'examples', '!(react-native*)'))
+  .sync(path.join(__dirname, '..', 'examples', 'react-native*'))
   .map((examplePath) => {
     const pkg = JSON.parse(
       fs.readFileSync(path.join(examplePath, 'package.json'))
