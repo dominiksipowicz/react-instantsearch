@@ -10,6 +10,7 @@
     "postinstall": "lerna run build:cjs --scope react-instantsearch-*",
     "start": "yarn storybook",
     "build": "lerna run build --scope react-*",
+    "build:types": "lerna run build:types --scope react-*",
     "watch": "lerna run watch --scope react-instantsearch-* --parallel",
     "release": "shipjs prepare",
     "lint": "eslint --ext .js,.ts,.tsx .",

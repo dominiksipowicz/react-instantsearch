@@ -1,7 +1,11 @@
 import { Hit as AlgoliaHit } from '@algolia/client-search';
 import algoliasearch from 'algoliasearch/lite';
 import React from 'react';
-import { InstantSearch, DynamicWidgets } from 'react-instantsearch-hooks';
+import {
+  InstantSearch,
+  DynamicWidgets,
+  useInstantSearch,
+} from 'react-instantsearch-hooks';
 
 import {
   ClearRefinements,
@@ -50,6 +54,14 @@ function Hit({ hit }: HitProps) {
   );
 }
 
+function SearchToolbox() {
+  const { uiState, results } = useInstantSearch();
+
+  console.log({ uiState, results });
+
+  return null;
+}
+
 export function App() {
   return (
     <InstantSearch
@@ -57,6 +69,7 @@ export function App() {
       indexName="instant_search"
       routing={true}
     >
+      <SearchToolbox />
       <Configure ruleContexts={[]} />
 
       <div className="Container">
