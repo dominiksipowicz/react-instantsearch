@@ -5,6 +5,7 @@ import { useIndexContext } from '../lib/useIndexContext';
 import { useInstantSearchContext } from '../lib/useInstantSearchContext';
 import { useInstantSearchServerContext } from '../lib/useInstantSearchServerContext';
 import { useIsomorphicLayoutEffect } from '../lib/useIsomorphicLayoutEffect';
+import { useStableProps } from '../lib/useStableProps';
 import { useStableValue } from '../lib/useStableValue';
 
 import type { Connector, Widget, WidgetDescription } from 'instantsearch.js';
@@ -22,7 +23,7 @@ export function useConnector<
   const serverContext = useInstantSearchServerContext();
   const search = useInstantSearchContext();
   const parentIndex = useIndexContext();
-  const stableProps = useStableValue(props);
+  const stableProps = useStableProps(props);
   const stableAdditionalWidgetProperties = useStableValue(
     additionalWidgetProperties
   );

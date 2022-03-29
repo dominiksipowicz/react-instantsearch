@@ -5,6 +5,7 @@ import connectHits from 'instantsearch.js/es/connectors/hits/connectHits';
 import React from 'react';
 
 import {
+  createMultiSearchResponse,
   createSearchClient,
   createSingleSearchResponse,
 } from '../../../../../test/mock';
@@ -31,6 +32,13 @@ type CustomSearchBoxWidgetDescription = {
   renderState: {
     query: string;
     refine(value: string): void;
+  };
+};
+
+type CustomHitsWidgetDescription = {
+  $$type: 'test.hits';
+  renderState: {
+    hits: any[];
   };
 };
 
@@ -125,6 +133,51 @@ const connectCustomSearchBoxWithoutRenderState: Connector<
         return {
           ...uiState,
           query: searchParameters.query,
+        };
+      },
+    };
+  };
+
+const connectCustomHits: Connector<
+  CustomHitsWidgetDescription,
+  { transformItems: (items: any[]) => any[] }
+> =
+  (renderFn, unmountFn = noop) =>
+  // @ts-ignore
+  (widgetParams) => {
+    return {
+      $$type: 'test.hits',
+      init(params) {
+        renderFn(
+          {
+            ...this.getWidgetRenderState!(params),
+            instantSearchInstance: params.instantSearchInstance,
+          },
+          true
+        );
+      },
+      render(params) {
+        renderFn(
+          {
+            ...this.getWidgetRenderState!(params),
+            instantSearchInstance: params.instantSearchInstance,
+          },
+          false
+        );
+      },
+      dispose() {
+        unmountFn();
+      },
+      getWidgetRenderState({ results }) {
+        if (!results) {
+          return {
+            hits: [],
+          };
+        }
+
+        return {
+          hits: widgetParams.transformItems(results.hits),
+          widgetParams,
         };
       },
     };
@@ -420,5 +473,77 @@ describe('useConnector', () => {
         }),
       ])
     );
+  });
+
+  test('runs latest version of function props', async () => {
+    let inStock = false;
+    const wrapper = createInstantSearchTestWrapper({
+      searchClient: createSearchClient({
+        search: jest.fn((requests) =>
+          Promise.resolve(
+            createMultiSearchResponse(
+              ...requests.map((request) =>
+                createSingleSearchResponse({
+                  index: request.indexName,
+                  hits: [
+                    {
+                      objectID: '1',
+                      name: 'item 1',
+                      inStock,
+                    },
+                    {
+                      objectID: '2',
+                      name: 'item 2',
+                      inStock,
+                    },
+                  ],
+                })
+              )
+            )
+          )
+        ),
+      }),
+    });
+
+    const { result, waitForNextUpdate } = renderHook(
+      () =>
+        useConnector(
+          connectCustomHits,
+          {
+            transformItems: (items) => {
+              return items.map((item) => ({ ...item, inStock }));
+            },
+          },
+          {}
+        ),
+      { wrapper }
+    );
+
+    // Initial render state
+    expect(result.current).toEqual({
+      hits: [],
+    });
+
+    // We update a variable that is used in `transformItems()` to check that the
+    // value is not stale when called.
+    inStock = true;
+
+    await waitForNextUpdate();
+
+    // Render state provided by InstantSearch Core during `render`.
+    expect(result.current).toEqual({
+      hits: [
+        {
+          objectID: '1',
+          name: 'item 1',
+          inStock: true,
+        },
+        {
+          objectID: '2',
+          name: 'item 2',
+          inStock: true,
+        },
+      ],
+    });
   });
 });
