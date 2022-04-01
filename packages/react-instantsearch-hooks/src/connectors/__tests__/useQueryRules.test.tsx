@@ -51,4 +51,38 @@ describe('useQueryRules', () => {
       ],
     });
   });
+
+  test('runs latest version of trackedFilters functions', async () => {
+    let brands = ['Apple'];
+    const wrapper = createInstantSearchTestWrapper();
+
+    const { result, waitForNextUpdate } = renderHook(
+      () =>
+        useQueryRules(
+          {
+            trackedFilters: {
+              brand: () => brands,
+            },
+          },
+          {}
+        ),
+      { wrapper }
+    );
+
+    // Initial render state
+    expect(result.current).toEqual({
+      items: [],
+    });
+
+    // We update a variable that is used in `transformItems()` to check that the
+    // value is not stale when called.
+    brands = ['Samsung'];
+
+    await waitForNextUpdate();
+
+    // Render state provided by InstantSearch Core during `render`.
+    expect(result.current).toEqual({
+      items: [],
+    });
+  });
 });

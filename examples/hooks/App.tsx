@@ -1,6 +1,6 @@
 import { Hit as AlgoliaHit } from 'instantsearch.js';
 import algoliasearch from 'algoliasearch/lite';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   InstantSearch,
   Configure,
@@ -18,6 +18,7 @@ import {
   SortBy,
   ToggleRefinement,
 } from 'react-instantsearch-hooks-dom';
+import { useSearchBox } from 'react-instantsearch-hooks';
 
 import {
   Breadcrumb,
@@ -54,13 +55,12 @@ function Hit({ hit }: HitProps) {
   );
 }
 
-export function App() {
+function Search() {
+  const [trackedFilters, setTrackedFilters] = useState(['Apple']);
+  const { query } = useSearchBox();
+
   return (
-    <InstantSearch
-      searchClient={searchClient}
-      indexName="instant_search"
-      routing={true}
-    >
+    <>
       <Configure ruleContexts={[]} />
 
       <div className="Container">
@@ -138,7 +138,7 @@ export function App() {
 
           <div className="CurrentRefinements">
             <ClearRefinements />
-            <CurrentRefinements
+            {/* <CurrentRefinements
               transformItems={(items) =>
                 items.map((item) => {
                   const label = item.label.startsWith('hierarchicalCategories')
@@ -151,16 +151,25 @@ export function App() {
                   };
                 })
               }
-            />
+            /> */}
           </div>
 
+          <button
+            onClick={() => {
+              setTrackedFilters((x) => (x.length === 0 ? ['Apple'] : []));
+            }}
+          >
+            Change tracked filters
+          </button>
+
+          {/* 
           <QueryRuleContext
             trackedFilters={{
-              brand: () => ['Apple'],
+              brand: () => trackedFilters,
             }}
-          />
+          /> */}
 
-          <QueryRuleCustomData>
+          {/* <QueryRuleCustomData>
             {({ items }) => (
               <>
                 {items.map((item) => (
@@ -170,7 +179,7 @@ export function App() {
                 ))}
               </>
             )}
-          </QueryRuleCustomData>
+          </QueryRuleCustomData> */}
 
           <Tabs>
             <Tab title="Hits">
@@ -183,6 +192,18 @@ export function App() {
           </Tabs>
         </div>
       </div>
+    </>
+  );
+}
+
+export function App() {
+  return (
+    <InstantSearch
+      searchClient={searchClient}
+      indexName="instant_search"
+      routing={true}
+    >
+      <Search />
     </InstantSearch>
   );
 }
