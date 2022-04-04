@@ -162,14 +162,13 @@ function Search() {
             Change tracked filters
           </button>
 
-          {/* 
           <QueryRuleContext
             trackedFilters={{
               brand: () => trackedFilters,
             }}
-          /> */}
+          />
 
-          {/* <QueryRuleCustomData>
+          <QueryRuleCustomData>
             {({ items }) => (
               <>
                 {items.map((item) => (
@@ -179,7 +178,7 @@ function Search() {
                 ))}
               </>
             )}
-          </QueryRuleCustomData> */}
+          </QueryRuleCustomData>
 
           <Tabs>
             <Tab title="Hits">
