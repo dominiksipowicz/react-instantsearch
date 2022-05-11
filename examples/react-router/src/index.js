@@ -1,12 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import 'instantsearch.css/themes/algolia.css';
+import App from './App';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+root.render(
   <Router>
     <Route path="/" component={App} />
-  </Router>,
-  document.getElementById('root')
+  </Router>
 );

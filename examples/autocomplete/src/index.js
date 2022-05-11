@@ -1,11 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
+
 import App from './App-Multi-Index';
 import Mentions from './App-Mentions';
 
-ReactDOM.render(
-  <App />,
+const root = createRoot(
   document.getElementById('autocomplete-with-multi-indices')
 );
+root.render(<App />);
 
-ReactDOM.render(<Mentions />, document.getElementById('autocomplete-mentions'));
+const mentionsRoot = createRoot(
+  document.getElementById('autocomplete-mentions')
+);
+mentionsRoot.render(<Mentions />);
