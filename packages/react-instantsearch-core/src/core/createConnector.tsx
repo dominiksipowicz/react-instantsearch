@@ -1,4 +1,4 @@
-import type { ReactType } from 'react';
+import type { ElementType } from 'react';
 import React, { Component } from 'react';
 import isEqual from 'react-fast-compare';
 import { shallowEqual, getDisplayName, removeEmptyKey } from './utils';
@@ -80,7 +80,7 @@ export function createConnectorWithoutContext(
     typeof connectorDesc.getMetadata === 'function' ||
     typeof connectorDesc.transitionState === 'function';
 
-  return (Composed: ReactType) => {
+  return (Composed: ElementType) => {
     class Connector extends Component<ConnectorProps, ConnectorState> {
       static displayName = `${connectorDesc.displayName}(${getDisplayName(
         Composed
@@ -351,7 +351,7 @@ export function createConnectorWithoutContext(
 }
 
 const createConnectorWithContext =
-  (connectorDesc: ConnectorDescription) => (Composed: ReactType) => {
+  (connectorDesc: ConnectorDescription) => (Composed: ElementType) => {
     const Connector = createConnectorWithoutContext(connectorDesc)(Composed);
 
     const ConnectorWrapper: React.FC<any> = (props) => (

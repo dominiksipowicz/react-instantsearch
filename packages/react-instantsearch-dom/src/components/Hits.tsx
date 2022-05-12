@@ -14,10 +14,7 @@ type HitProps = {
 type Props = {
   hits: Hit[];
   className?: string;
-  hitComponent?:
-    | string
-    | React.ReactType<HitProps>
-    | React.ExoticComponent<HitProps>;
+  hitComponent?: string | React.JSXElementConstructor<HitProps>;
 };
 
 const cx = createClassNames('Hits');
