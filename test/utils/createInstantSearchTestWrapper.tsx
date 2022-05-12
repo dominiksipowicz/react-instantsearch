@@ -1,3 +1,5 @@
+import type { WrapperComponent } from '@testing-library/react-hooks';
+import type { ReactNode } from 'react';
 import React from 'react';
 import type { InstantSearchProps } from '../../packages/react-instantsearch-hooks/src';
 import { InstantSearch } from '../../packages/react-instantsearch-hooks/src';
@@ -8,7 +10,7 @@ export function createInstantSearchTestWrapper(
   props?: Partial<InstantSearchProps>
 ) {
   const searchClient = createSearchClient({});
-  const wrapper = ({ children }) => (
+  const wrapper: WrapperComponent<{ children: ReactNode }> = ({ children }) => (
     <InstantSearch searchClient={searchClient} indexName="indexName" {...props}>
       {children}
     </InstantSearch>
