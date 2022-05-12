@@ -149,24 +149,19 @@ describe('RangeInput', () => {
   test('calls `onSubmit` callback when submitting form', async () => {
     const props = createProps({ start: [100, 1000] });
     const { container } = render(<RangeInput {...props} />);
+    const submitButton = container.querySelector('.ais-RangeInput-submit')!;
+    const minInput = container.querySelector('.ais-RangeInput-input--min')!;
+    const maxInput = container.querySelector('.ais-RangeInput-input--max')!;
 
-    await userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
+    await userEvent.click(submitButton);
 
     expect(props.onSubmit).toHaveBeenCalledTimes(1);
     expect(props.onSubmit).toHaveBeenLastCalledWith([100, 1000]);
 
-    await userEvent.type(
-      container.querySelector('.ais-RangeInput-input--min')!,
-      '500',
-      { initialSelectionStart: 0 }
-    );
-    await userEvent.type(
-      container.querySelector('.ais-RangeInput-input--max')!,
-      '5000',
-      { initialSelectionStart: 0 }
-    );
+    await userEvent.type(minInput, '500');
+    await userEvent.type(maxInput, '5000');
 
-    await userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
+    await userEvent.click(submitButton);
 
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
     expect(props.onSubmit).toHaveBeenLastCalledWith([500, 5000]);
