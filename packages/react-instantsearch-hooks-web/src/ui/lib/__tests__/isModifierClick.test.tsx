@@ -8,10 +8,12 @@ describe('isModifierClick', () => {
   test('returns `true` when holding the middle button', async () => {
     const onClick = jest.fn();
     const { getByRole } = render(<button onClick={onClick} />);
+    const button = getByRole('button');
 
     const user = userEvent.setup();
     // @TODO this doesn't seem to be the right way to do this
-    await user.pointer({ keys: '[MouseMiddle]', target: getByRole('button') });
+    await user.pointer({ keys: '[MouseMiddle]', target: button });
+    await user.click(button);
 
     expect(isModifierClick(onClick.mock.calls[0][0])).toBe(true);
   });

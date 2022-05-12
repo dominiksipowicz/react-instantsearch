@@ -20,7 +20,10 @@ describe('Pagination', () => {
       showPrevious: true,
       showNext: true,
       showLast: true,
-      createURL: (value: number) => `/?page=${value + 1}`,
+      // We use a hash URL because navigating to a different URL is not supported
+      // by JSDOM.
+      // See https://github.com/jsdom/jsdom/issues/2112
+      createURL: (value: number) => `#page-${value + 1}`,
       onNavigate,
       translations: {
         first: '‹‹',
@@ -68,14 +71,14 @@ describe('Pagination', () => {
     const lastPageLink = lastPageItem!.querySelector('.ais-Pagination-link');
 
     expect(firstPageLink).toHaveAttribute('aria-label', 'First');
-    expect(firstPageLink).toHaveAttribute('href', '/?page=1');
+    expect(firstPageLink).toHaveAttribute('href', '#page-1');
     expect(previousPageLink).toHaveAttribute('aria-label', 'Previous');
-    expect(previousPageLink).toHaveAttribute('href', '/?page=1');
+    expect(previousPageLink).toHaveAttribute('href', '#page-1');
 
     expect(nextPageLink).toHaveAttribute('aria-label', 'Next');
-    expect(nextPageLink).toHaveAttribute('href', '/?page=3');
+    expect(nextPageLink).toHaveAttribute('href', '#page-3');
     expect(lastPageLink).toHaveAttribute('aria-label', 'Last');
-    expect(lastPageLink).toHaveAttribute('href', '/?page=6');
+    expect(lastPageLink).toHaveAttribute('href', '#page-6');
 
     expect(container).toMatchInlineSnapshot(`
       <div>
@@ -91,7 +94,7 @@ describe('Pagination', () => {
               <a
                 aria-label="First"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 ‹‹
               </a>
@@ -102,7 +105,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Previous"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 ‹
               </a>
@@ -113,7 +116,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -124,7 +127,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -135,7 +138,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=3"
+                href="#page-3"
               >
                 ›
               </a>
@@ -146,7 +149,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=6"
+                href="#page-6"
               >
                 ››
               </a>
@@ -189,7 +192,7 @@ describe('Pagination', () => {
               <a
                 aria-label="First"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 ‹‹
               </a>
@@ -200,7 +203,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Previous"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 ‹
               </a>
@@ -211,7 +214,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -222,7 +225,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -310,7 +313,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -321,7 +324,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -332,7 +335,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -343,7 +346,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
@@ -411,7 +414,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -422,7 +425,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -433,7 +436,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -444,7 +447,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
@@ -497,7 +500,7 @@ describe('Pagination', () => {
               <a
                 aria-label="First"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 ‹‹
               </a>
@@ -508,7 +511,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Previous"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 ‹
               </a>
@@ -519,7 +522,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -530,7 +533,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -682,7 +685,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -693,7 +696,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -704,7 +707,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -715,7 +718,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
@@ -760,7 +763,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -771,7 +774,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -782,7 +785,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -793,7 +796,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
@@ -846,7 +849,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -857,7 +860,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -868,7 +871,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
@@ -921,7 +924,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -932,7 +935,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -943,7 +946,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -998,7 +1001,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -1009,7 +1012,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -1020,7 +1023,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -1031,7 +1034,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
@@ -1098,7 +1101,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link LINK"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -1109,7 +1112,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link LINK"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -1120,7 +1123,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link LINK"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -1131,7 +1134,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link LINK"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
@@ -1188,7 +1191,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 1"
                 class="ais-Pagination-link"
-                href="/?page=1"
+                href="#page-1"
               >
                 1
               </a>
@@ -1199,7 +1202,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Page 2"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 2
               </a>
@@ -1210,7 +1213,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Next"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ›
               </a>
@@ -1221,7 +1224,7 @@ describe('Pagination', () => {
               <a
                 aria-label="Last"
                 class="ais-Pagination-link"
-                href="/?page=2"
+                href="#page-2"
               >
                 ››
               </a>
