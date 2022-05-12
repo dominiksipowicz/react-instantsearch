@@ -4,7 +4,7 @@ import { useDynamicWidgets } from '../connectors/useDynamicWidgets';
 import { invariant } from '../lib/invariant';
 
 import type { DynamicWidgetsConnectorParams } from 'instantsearch.js/es/connectors/dynamic-widgets/connectDynamicWidgets';
-import type { ReactChild, ComponentType, ReactNode } from 'react';
+import type { ReactElement, ComponentType, ReactNode } from 'react';
 
 function FallbackComponent() {
   return null;
@@ -32,7 +32,7 @@ export function DynamicWidgets({
   const { attributesToRender } = useDynamicWidgets(props, {
     $$widgetType: 'ais.dynamicWidgets',
   });
-  const widgets: Map<string, ReactChild> = new Map();
+  const widgets: Map<string, ReactNode> = new Map();
 
   React.Children.forEach(children, (child) => {
     const attribute = getWidgetAttribute(child);
@@ -56,8 +56,12 @@ export function DynamicWidgets({
   );
 }
 
-function getWidgetAttribute(component: ReactChild): string | undefined {
-  if (typeof component !== 'object') {
+function isReactElement(component: any): component is ReactElement {
+  return typeof component === 'object' && component.props;
+}
+
+function getWidgetAttribute(component: ReactNode): string | undefined {
+  if (!isReactElement(component)) {
     return undefined;
   }
 
