@@ -47,7 +47,7 @@ export function SearchBox({ onChange, ...props }: SearchBoxProps) {
         autoCapitalize="none"
         autoCorrect={false}
         spellCheck={false}
-        autoCompleteType="off"
+        autoComplete="off"
       />
     </View>
   );
