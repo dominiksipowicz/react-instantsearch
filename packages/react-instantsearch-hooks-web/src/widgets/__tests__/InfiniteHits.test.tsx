@@ -201,9 +201,9 @@ describe('InfiniteHits', () => {
       },
     ]);
 
-    act(() => {
-      userEvent.click(container.querySelector('.ais-InfiniteHits-loadMore')!);
-    });
+    await userEvent.click(
+      container.querySelector('.ais-InfiniteHits-loadMore')!
+    );
 
     await wait(0);
 
@@ -256,11 +256,9 @@ describe('InfiniteHits', () => {
       },
     ]);
 
-    act(() => {
-      userEvent.click(
-        container.querySelector('.ais-InfiniteHits-loadPrevious')!
-      );
-    });
+    await userEvent.click(
+      container.querySelector('.ais-InfiniteHits-loadPrevious')!
+    );
 
     await wait(0);
 

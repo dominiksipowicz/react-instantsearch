@@ -37,23 +37,23 @@ describe('ClearRefinements', () => {
     `);
   });
 
-  test('passes an `onClick` callback to the button', () => {
+  test('passes an `onClick` callback to the button', async () => {
     const props = createProps({});
     const onClick = jest.fn();
     const { container } = render(
       <ClearRefinements {...props} onClick={onClick} />
     );
 
-    userEvent.click(
-      container.querySelector(
+    await userEvent.click(
+      container.querySelector<HTMLButtonElement>(
         '.ais-ClearRefinements-button'
-      ) as HTMLButtonElement
+      )!
     );
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  test('disables the button', () => {
+  test('disables the button', async () => {
     const props = createProps({});
     const onClick = jest.fn();
     const { container } = render(
@@ -79,10 +79,10 @@ describe('ClearRefinements', () => {
       </div>
     `);
 
-    userEvent.click(
-      container.querySelector(
+    await userEvent.click(
+      container.querySelector<HTMLButtonElement>(
         '.ais-ClearRefinements-button'
-      ) as HTMLButtonElement
+      )!
     );
 
     expect(onClick).toHaveBeenCalledTimes(0);

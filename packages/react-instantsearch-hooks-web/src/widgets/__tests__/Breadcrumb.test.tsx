@@ -297,7 +297,7 @@ describe('Breadcrumb', () => {
       </div>
     `);
 
-    userEvent.click(getByText('Cameras & Camcorders'));
+    await userEvent.click(getByText('Cameras & Camcorders'));
 
     await wait(0);
 

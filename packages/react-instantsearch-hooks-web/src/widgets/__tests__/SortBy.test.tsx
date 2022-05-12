@@ -136,8 +136,8 @@ describe('SortBy', () => {
       ])
     );
 
-    userEvent.selectOptions(
-      document.querySelector('.ais-SortBy-select') as HTMLSelectElement,
+    await userEvent.selectOptions(
+      document.querySelector<HTMLSelectElement>('.ais-SortBy-select')!,
       getByRole('option', { name: 'Price (asc)' })
     );
 

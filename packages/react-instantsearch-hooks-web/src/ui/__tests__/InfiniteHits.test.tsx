@@ -267,7 +267,7 @@ describe('InfiniteHits', () => {
     ).toBeNull();
   });
 
-  test('passes an `onShowPrevious` callback to the "Show Previous" button', () => {
+  test('passes an `onShowPrevious` callback to the "Show Previous" button', async () => {
     const props = createProps({});
     const onShowPrevious = jest.fn();
 
@@ -279,16 +279,14 @@ describe('InfiniteHits', () => {
       />
     );
 
-    act(() => {
-      userEvent.click(
-        container.querySelector('.ais-InfiniteHits-loadPrevious')!
-      );
-    });
+    await userEvent.click(
+      container.querySelector('.ais-InfiniteHits-loadPrevious')!
+    );
 
     expect(onShowPrevious).toHaveBeenCalledTimes(1);
   });
 
-  test('passes an `onShowMore` callback to the "Show More" button', () => {
+  test('passes an `onShowMore` callback to the "Show More" button', async () => {
     const props = createProps({});
     const onShowMore = jest.fn();
 
@@ -296,9 +294,9 @@ describe('InfiniteHits', () => {
       <InfiniteHits {...props} isFirstPage={false} onShowMore={onShowMore} />
     );
 
-    act(() => {
-      userEvent.click(container.querySelector('.ais-InfiniteHits-loadMore')!);
-    });
+    await userEvent.click(
+      container.querySelector('.ais-InfiniteHits-loadMore')!
+    );
 
     expect(onShowMore).toHaveBeenCalledTimes(1);
   });

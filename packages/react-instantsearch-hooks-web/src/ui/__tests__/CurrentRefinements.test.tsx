@@ -21,7 +21,7 @@ describe('CurrentRefinements', () => {
     `);
   });
 
-  test('renders with clickable refinements', () => {
+  test('renders with clickable refinements', async () => {
     const onRemove = jest.fn();
 
     const { container } = render(
@@ -107,7 +107,7 @@ describe('CurrentRefinements', () => {
       '.ais-CurrentRefinements-delete'
     );
 
-    userEvent.click(button1);
+    await userEvent.click(button1);
 
     expect(onRemove).toHaveBeenLastCalledWith({
       attribute: 'brand',
@@ -116,7 +116,7 @@ describe('CurrentRefinements', () => {
       value: 'Apple',
     });
 
-    userEvent.click(button2);
+    await userEvent.click(button2);
 
     expect(onRemove).toHaveBeenLastCalledWith({
       attribute: 'brand',

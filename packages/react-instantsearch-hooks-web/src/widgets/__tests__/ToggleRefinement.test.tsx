@@ -96,7 +96,7 @@ describe('ToggleRefinement', () => {
 
     expect(checkbox.checked).toBe(false);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await wait(0);
 
@@ -114,7 +114,7 @@ describe('ToggleRefinement', () => {
     );
     expect(checkbox.checked).toBe(true);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await wait(0);
 
@@ -149,7 +149,7 @@ describe('ToggleRefinement', () => {
       '.ais-ToggleRefinement-checkbox'
     )!;
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await wait(0);
 
@@ -166,7 +166,7 @@ describe('ToggleRefinement', () => {
       ])
     );
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await wait(0);
 

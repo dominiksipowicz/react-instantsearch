@@ -285,16 +285,13 @@ describe('SearchBox', () => {
     const input = container.querySelector<HTMLInputElement>(
       '.ais-SearchBox-input'
     )!;
-    input.focus();
 
     await waitFor(() => {
       expect(input).toHaveValue('something');
     });
 
-    ' else'.split('').forEach((letter) => {
-      act(() => {
-        userEvent.type(input, letter);
-      });
+    await userEvent.type(input, ' else', {
+      initialSelectionStart: 'something'.length,
     });
 
     await waitFor(() => {
@@ -321,20 +318,17 @@ describe('SearchBox', () => {
       </InstantSearchHooksTestWrapper>
     );
 
-    const resetButton = container.querySelector<HTMLButtonElement>(
-      '.ais-SearchBox-reset'
-    )!;
     const input = container.querySelector<HTMLInputElement>(
       '.ais-SearchBox-input'
     )!;
 
     await waitFor(() => {
-      expect(input.value).toEqual('something');
+      expect(input).toHaveValue('something');
     });
 
-    act(() => {
-      userEvent.click(resetButton);
-    });
+    await userEvent.click(
+      container.querySelector<HTMLButtonElement>('.ais-SearchBox-reset')!
+    );
 
     await waitFor(() => {
       expect(lastUiState.indexName.query).toEqual(undefined);
@@ -356,12 +350,9 @@ describe('SearchBox', () => {
     const input = container.querySelector<HTMLInputElement>(
       '.ais-SearchBox-input'
     )!;
-    input.focus();
 
-    act(() => {
-      // Trigger a change to get the `setUiState` reference
-      userEvent.type(input, 'q');
-    });
+    // Trigger a change to get the `setUiState` reference
+    await userEvent.type(input, 'q');
 
     act(() => {
       input.blur();

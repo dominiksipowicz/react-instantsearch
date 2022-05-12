@@ -122,10 +122,8 @@ describe('ClearRefinements', () => {
       </div>
     `);
 
-    userEvent.click(
-      document.querySelector(
-        '.ais-ClearRefinements-button'
-      ) as HTMLButtonElement
+    await userEvent.click(
+      document.querySelector<HTMLButtonElement>('.ais-ClearRefinements-button')!
     );
 
     await wait(0);
@@ -204,10 +202,8 @@ describe('ClearRefinements', () => {
       </div>
     `);
 
-    userEvent.click(
-      document.querySelector(
-        '.ais-ClearRefinements-button'
-      ) as HTMLButtonElement
+    await userEvent.click(
+      document.querySelector<HTMLButtonElement>('.ais-ClearRefinements-button')!
     );
 
     await wait(0);
@@ -297,10 +293,8 @@ describe('ClearRefinements', () => {
       </div>
     `);
 
-    userEvent.click(
-      document.querySelector(
-        '.ais-ClearRefinements-button'
-      ) as HTMLButtonElement
+    await userEvent.click(
+      document.querySelector<HTMLButtonElement>('.ais-ClearRefinements-button')!
     );
 
     await wait(0);
@@ -392,10 +386,8 @@ describe('ClearRefinements', () => {
       </div>
     `);
 
-    userEvent.click(
-      document.querySelector(
-        '.ais-ClearRefinements-button'
-      ) as HTMLButtonElement
+    await userEvent.click(
+      document.querySelector<HTMLButtonElement>('.ais-ClearRefinements-button')!
     );
 
     await wait(0);

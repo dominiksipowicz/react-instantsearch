@@ -126,10 +126,10 @@ describe('HierarchicalMenu', () => {
       '.ais-HierarchicalMenu-item'
     ) as HTMLLIElement;
 
-    userEvent.click(
-      firstCategory.querySelector(
+    await userEvent.click(
+      firstCategory.querySelector<HTMLAnchorElement>(
         '.ais-HierarchicalMenu-link'
-      ) as HTMLAnchorElement
+      )!
     );
 
     await wait(0);
@@ -386,7 +386,7 @@ describe('HierarchicalMenu', () => {
         'Wearable Technology n',
       ]);
 
-      userEvent.click(await findByText('Video Games n'));
+      await userEvent.click(await findByText('Video Games n'));
 
       await wait(0);
 
@@ -400,7 +400,7 @@ describe('HierarchicalMenu', () => {
         'Wearable Technology n',
       ]);
 
-      userEvent.click(await findByText('Wearable Technology n'));
+      await userEvent.click(await findByText('Wearable Technology n'));
 
       await wait(0);
 
@@ -492,7 +492,7 @@ describe('HierarchicalMenu', () => {
         </div>
       `);
 
-      userEvent.click(showMoreButton);
+      await userEvent.click(showMoreButton);
 
       await wait(0);
 
@@ -592,9 +592,9 @@ describe('HierarchicalMenu', () => {
 
       await wait(0);
 
-      const showMoreButton = container.querySelector(
+      const showMoreButton = container.querySelector<HTMLButtonElement>(
         '.ais-HierarchicalMenu-showMore'
-      ) as HTMLButtonElement;
+      )!;
 
       expect(
         container.querySelectorAll('.ais-HierarchicalMenu-item')
@@ -637,7 +637,7 @@ describe('HierarchicalMenu', () => {
         </div>
       `);
 
-      userEvent.click(showMoreButton);
+      await userEvent.click(showMoreButton);
 
       await wait(0);
 

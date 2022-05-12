@@ -177,7 +177,7 @@ describe('HitsPerPage', () => {
 
     expect(searchClient.search).toHaveBeenCalledTimes(1);
 
-    userEvent.selectOptions(getByRole('combobox'), ['30']);
+    await userEvent.selectOptions(getByRole('combobox'), ['30']);
 
     expect(searchClient.search).toHaveBeenCalledTimes(2);
     expect(searchClient.search).toHaveBeenLastCalledWith(

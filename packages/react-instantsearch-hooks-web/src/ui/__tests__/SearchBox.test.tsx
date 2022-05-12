@@ -379,7 +379,7 @@ describe('SearchBox', () => {
   });
 
   describe('onSubmit', () => {
-    test('calls provided onSubmit', () => {
+    test('calls provided onSubmit', async () => {
       const props = createProps({});
 
       const { container } = render(<SearchBox {...props} />);
@@ -387,14 +387,14 @@ describe('SearchBox', () => {
         '.ais-SearchBox-input'
       )!;
 
-      userEvent.type(input, 'query');
+      await userEvent.type(input, 'query');
       expect(props.onSubmit).toHaveBeenCalledTimes(0);
 
-      userEvent.type(input, '{enter}');
+      await userEvent.type(input, '{enter}');
       expect(props.onSubmit).toHaveBeenCalledTimes(1);
     });
 
-    test('blurs input onSubmit', () => {
+    test('blurs input onSubmit', async () => {
       const props = createProps({});
 
       const { container } = render(<SearchBox {...props} />);
@@ -402,16 +402,16 @@ describe('SearchBox', () => {
         '.ais-SearchBox-input'
       )!;
 
-      userEvent.type(input, 'query');
+      await userEvent.type(input, 'query');
       expect(document.activeElement).toBe(props.inputRef.current);
 
-      userEvent.type(input, '{enter}');
+      await userEvent.type(input, '{enter}');
       expect(document.activeElement).not.toBe(props.inputRef.current);
     });
   });
 
   describe('onReset', () => {
-    test('calls provided onReset', () => {
+    test('calls provided onReset', async () => {
       const props = createProps({});
 
       const { container } = render(<SearchBox {...props} />);
@@ -422,14 +422,14 @@ describe('SearchBox', () => {
         '.ais-SearchBox-input'
       )!;
 
-      userEvent.type(input, 'query');
+      await userEvent.type(input, 'query');
       expect(props.onReset).toHaveBeenCalledTimes(0);
 
-      userEvent.click(resetButton);
+      await userEvent.click(resetButton);
       expect(props.onReset).toHaveBeenCalledTimes(1);
     });
 
-    test('focuses input onReset', () => {
+    test('focuses input onReset', async () => {
       const props = createProps({});
 
       const { container } = render(<SearchBox {...props} />);
@@ -440,16 +440,16 @@ describe('SearchBox', () => {
         '.ais-SearchBox-input'
       )!;
 
-      userEvent.type(input, 'query');
+      await userEvent.type(input, 'query');
       expect(document.activeElement).toBe(props.inputRef.current);
 
-      userEvent.click(resetButton);
+      await userEvent.click(resetButton);
       expect(document.activeElement).toBe(props.inputRef.current);
     });
   });
 
   describe('onChange', () => {
-    test('calls provided onChange', () => {
+    test('calls provided onChange', async () => {
       const props = createProps({});
 
       const { container } = render(<SearchBox {...props} />);
@@ -457,7 +457,7 @@ describe('SearchBox', () => {
         '.ais-SearchBox-input'
       )!;
 
-      userEvent.type(input, 'query');
+      await userEvent.type(input, 'query');
       expect(props.onChange).toHaveBeenCalledTimes(5);
     });
   });

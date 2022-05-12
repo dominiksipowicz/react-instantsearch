@@ -156,16 +156,16 @@ describe('RangeInput', () => {
 
     expect(client.search).toHaveBeenCalledTimes(1);
 
-    userEvent.type(
+    await userEvent.type(
       container.querySelector('.ais-RangeInput-input--min')!,
       '100'
     );
-    userEvent.type(
+    await userEvent.type(
       container.querySelector('.ais-RangeInput-input--max')!,
       '200'
     );
 
-    userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
+    await userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
 
     await wait(0);
 

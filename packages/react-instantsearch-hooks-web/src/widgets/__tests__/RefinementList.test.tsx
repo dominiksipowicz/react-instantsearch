@@ -370,7 +370,7 @@ describe('RefinementList', () => {
 
     expect(firstCheckbox).not.toBeChecked();
 
-    userEvent.click(firstCheckbox);
+    await userEvent.click(firstCheckbox);
 
     await wait(0);
 
@@ -404,8 +404,8 @@ describe('RefinementList', () => {
       ) as NodeListOf<HTMLInputElement>),
     ].slice(0, 2);
 
-    userEvent.click(checkbox1);
-    userEvent.click(checkbox2);
+    await userEvent.click(checkbox1);
+    await userEvent.click(checkbox2);
 
     await wait(0);
 
@@ -962,8 +962,8 @@ describe('RefinementList', () => {
         ) as NodeListOf<HTMLInputElement>
       ).slice(-2);
 
-      userEvent.click(checkbox1);
-      userEvent.click(checkbox2);
+      await userEvent.click(checkbox1);
+      await userEvent.click(checkbox2);
 
       await wait(0);
 
@@ -1061,7 +1061,7 @@ describe('RefinementList', () => {
         'Whirlpool',
       ]);
 
-      userEvent.type(searchInput, 'app');
+      await userEvent.type(searchInput, 'app');
 
       await wait(0);
 
@@ -1120,8 +1120,8 @@ describe('RefinementList', () => {
 
       await wait(0);
 
-      userEvent.type(
-        container.querySelector('.ais-SearchBox-input') as HTMLInputElement,
+      await userEvent.type(
+        container.querySelector<HTMLInputElement>('.ais-SearchBox-input')!,
         'nothing'
       );
 
@@ -1512,7 +1512,7 @@ describe('RefinementList', () => {
         </div>
       `);
 
-      userEvent.click(showMoreButton);
+      await userEvent.click(showMoreButton);
 
       await wait(0);
 
@@ -2267,10 +2267,10 @@ describe('RefinementList', () => {
         </div>
       `);
 
-      userEvent.click(
-        container.querySelector(
+      await userEvent.click(
+        container.querySelector<HTMLButtonElement>(
           '.ais-RefinementList-showMore'
-        ) as HTMLButtonElement
+        )!
       );
 
       await wait(0);

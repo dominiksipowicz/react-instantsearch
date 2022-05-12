@@ -244,7 +244,7 @@ describe('CurrentRefinements', () => {
       '.ais-CurrentRefinements-delete'
     );
 
-    userEvent.click(button3);
+    await userEvent.click(button3);
 
     await wait(0);
 
@@ -259,7 +259,7 @@ describe('CurrentRefinements', () => {
       document.querySelectorAll('.ais-CurrentRefinements-category')
     ).toHaveLength(2);
 
-    userEvent.click(button1);
+    await userEvent.click(button1);
 
     await wait(0);
 
@@ -273,7 +273,7 @@ describe('CurrentRefinements', () => {
       document.querySelectorAll('.ais-CurrentRefinements-category')
     ).toHaveLength(1);
 
-    userEvent.click(button2);
+    await userEvent.click(button2);
 
     await wait(0);
 
@@ -310,10 +310,10 @@ describe('CurrentRefinements', () => {
 
     await wait(0);
 
-    userEvent.click(
-      document.querySelector(
+    await userEvent.click(
+      document.querySelector<HTMLButtonElement>(
         '.ais-CurrentRefinements-delete'
-      ) as HTMLButtonElement
+      )!
     );
 
     await wait(0);
@@ -384,11 +384,47 @@ describe('CurrentRefinements', () => {
       '.ais-CurrentRefinements-delete'
     ) as HTMLButtonElement;
 
-    userEvent.click(button, { button: 1 });
-    userEvent.click(button, { altKey: true });
-    userEvent.click(button, { ctrlKey: true });
-    userEvent.click(button, { metaKey: true });
-    userEvent.click(button, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[ShiftLeft>]');
+      await user.click(button);
+    }
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[ShiftRight>]');
+      await user.click(button);
+    }
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[ControlLeft>]');
+      await user.click(button);
+    }
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[ControlRight>]');
+      await user.click(button);
+    }
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[AltLeft>]');
+      await user.click(button);
+    }
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[AltRight>]');
+      await user.click(button);
+    }
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[MetaLeft>]');
+      await user.click(button);
+    }
+    {
+      const user = userEvent.setup();
+      await user.keyboard('[MetaRight>]');
+      await user.click(button);
+    }
+    await userEvent.pointer({ keys: '[MouseMiddle]', target: button });
 
     await wait(0);
 

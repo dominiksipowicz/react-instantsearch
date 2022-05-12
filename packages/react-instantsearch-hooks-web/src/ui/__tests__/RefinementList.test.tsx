@@ -102,7 +102,7 @@ describe('RefinementList', () => {
     `);
   });
 
-  test('triggers an `onRefine` callback when clicking a checkbox', () => {
+  test('triggers an `onRefine` callback when clicking a checkbox', async () => {
     const props = createProps({});
     const { container } = render(<RefinementList {...props} />);
 
@@ -111,9 +111,9 @@ describe('RefinementList', () => {
     );
     expect(checkboxes.length).toBe(4);
 
-    checkboxes.forEach((checkbox) => {
-      userEvent.click(checkbox);
-    });
+    for (const checkbox of checkboxes) {
+      await userEvent.click(checkbox);
+    }
 
     expect(props.onRefine).toHaveBeenCalledTimes(checkboxes.length);
   });
@@ -191,7 +191,7 @@ describe('RefinementList', () => {
           `);
     });
 
-    test('calls onToggleShowMore', () => {
+    test('calls onToggleShowMore', async () => {
       const props = createProps({});
       const { container } = render(<RefinementList {...props} showMore />);
 
@@ -199,7 +199,7 @@ describe('RefinementList', () => {
 
       expect(props.onToggleShowMore).not.toHaveBeenCalled();
 
-      userEvent.click(showMore);
+      await userEvent.click(showMore);
 
       expect(props.onToggleShowMore).toHaveBeenCalledTimes(1);
     });

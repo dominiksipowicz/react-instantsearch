@@ -67,11 +67,11 @@ describe('ToggleRefinement', () => {
     ).toBe(true);
   });
 
-  test('passes an `onChange` callback to the checkbox', () => {
+  test('passes an `onChange` callback to the checkbox', async () => {
     const props = createProps({});
     const { container } = render(<ToggleRefinement {...props} />);
 
-    userEvent.click(
+    await userEvent.click(
       container.querySelector<HTMLInputElement>(
         '.ais-ToggleRefinement-checkbox'
       )!

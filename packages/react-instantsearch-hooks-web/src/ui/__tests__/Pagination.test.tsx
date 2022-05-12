@@ -157,7 +157,7 @@ describe('Pagination', () => {
     `);
   });
 
-  test('enables first and previous page when current page is not the first page', () => {
+  test('enables first and previous page when current page is not the first page', async () => {
     const props = createProps({
       currentPage: 1,
       isFirstPage: false,
@@ -168,10 +168,10 @@ describe('Pagination', () => {
 
     const firstPageItem = document.querySelector(
       '.ais-Pagination-item--firstPage'
-    );
+    )!;
     const previousPageItem = document.querySelector(
       '.ais-Pagination-item--previousPage'
-    );
+    )!;
 
     expect(firstPageItem).not.toHaveClass('ais-Pagination-item--disabled');
     expect(previousPageItem).not.toHaveClass('ais-Pagination-item--disabled');
@@ -252,29 +252,27 @@ describe('Pagination', () => {
       </div>
     `);
 
-    userEvent.click(
-      firstPageItem!.querySelector('.ais-Pagination-link') as HTMLButtonElement
+    await userEvent.click(
+      firstPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
-    userEvent.click(
-      previousPageItem!.querySelector(
-        '.ais-Pagination-link'
-      ) as HTMLButtonElement
+    await userEvent.click(
+      previousPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
 
     expect(props.onNavigate).toHaveBeenCalledTimes(2);
   });
 
-  test('disables first and previous page when current page is the first page', () => {
+  test('disables first and previous page when current page is the first page', async () => {
     const props = createProps({});
 
     const { container } = render(<Pagination {...props} />);
 
     const firstPageItem = document.querySelector(
       '.ais-Pagination-item--firstPage'
-    );
+    )!;
     const previousPageItem = document.querySelector(
       '.ais-Pagination-item--previousPage'
-    );
+    )!;
 
     expect(firstPageItem).toHaveClass('ais-Pagination-item--disabled');
     expect(previousPageItem).toHaveClass('ais-Pagination-item--disabled');
@@ -355,29 +353,27 @@ describe('Pagination', () => {
       </div>
     `);
 
-    userEvent.click(
-      firstPageItem!.querySelector('.ais-Pagination-link') as HTMLButtonElement
+    await userEvent.click(
+      firstPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
-    userEvent.click(
-      previousPageItem!.querySelector(
-        '.ais-Pagination-link'
-      ) as HTMLButtonElement
+    await userEvent.click(
+      previousPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
 
     expect(props.onNavigate).not.toHaveBeenCalled();
   });
 
-  test('enables next and last page when current page is not the last page', () => {
+  test('enables next and last page when current page is not the last page', async () => {
     const props = createProps({});
 
     const { container } = render(<Pagination {...props} />);
 
     const nextPageItem = document.querySelector(
       '.ais-Pagination-item--nextPage'
-    );
+    )!;
     const lastPageItem = document.querySelector(
       '.ais-Pagination-item--lastPage'
-    );
+    )!;
 
     expect(nextPageItem).not.toHaveClass('ais-Pagination-item--disabled');
     expect(lastPageItem).not.toHaveClass('ais-Pagination-item--disabled');
@@ -458,17 +454,17 @@ describe('Pagination', () => {
       </div>
     `);
 
-    userEvent.click(
-      nextPageItem!.querySelector('.ais-Pagination-link') as HTMLButtonElement
+    await userEvent.click(
+      nextPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
-    userEvent.click(
-      lastPageItem!.querySelector('.ais-Pagination-link') as HTMLButtonElement
+    await userEvent.click(
+      lastPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
 
     expect(props.onNavigate).toHaveBeenCalledTimes(2);
   });
 
-  test('disables next and last page when current page is the last page', () => {
+  test('disables next and last page when current page is the last page', async () => {
     const props = createProps({
       currentPage: 1,
       nbPages: 2,
@@ -480,10 +476,10 @@ describe('Pagination', () => {
 
     const nextPageItem = document.querySelector(
       '.ais-Pagination-item--nextPage'
-    );
+    )!;
     const lastPageItem = document.querySelector(
       '.ais-Pagination-item--lastPage'
-    );
+    )!;
 
     expect(nextPageItem).toHaveClass('ais-Pagination-item--disabled');
     expect(lastPageItem).toHaveClass('ais-Pagination-item--disabled');
@@ -564,74 +560,90 @@ describe('Pagination', () => {
       </div>
     `);
 
-    userEvent.click(
-      nextPageItem!.querySelector('.ais-Pagination-link') as HTMLButtonElement
+    await userEvent.click(
+      nextPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
-    userEvent.click(
-      lastPageItem!.querySelector('.ais-Pagination-link') as HTMLButtonElement
+    await userEvent.click(
+      lastPageItem.querySelector<HTMLButtonElement>('.ais-Pagination-link')!
     );
 
     expect(props.onNavigate).not.toHaveBeenCalled();
   });
 
-  test('does not trigger `onNavigate` callback when pressing a modifier key', () => {
+  test('does not trigger `onNavigate` callback when pressing a modifier key', async () => {
     const props = createProps({});
 
     const { getByText } = render(<Pagination {...props} />);
 
     const firstPageItem = document.querySelector(
       '.ais-Pagination-item--firstPage'
-    );
-    const firstPageLink = firstPageItem!.querySelector('.ais-Pagination-link');
+    )!;
+    const firstPageLink = firstPageItem.querySelector<HTMLAnchorElement>(
+      '.ais-Pagination-link'
+    )!;
 
-    userEvent.click(firstPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(firstPageLink);
+    }
 
     const previousPageItem = document.querySelector(
       '.ais-Pagination-item--previousPage'
-    );
-    const previousPageLink = previousPageItem!.querySelector(
+    )!;
+    const previousPageLink = previousPageItem.querySelector<HTMLAnchorElement>(
       '.ais-Pagination-link'
-    );
+    )!;
 
-    userEvent.click(previousPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(previousPageLink);
+    }
 
     const nextPageItem = document.querySelector(
       '.ais-Pagination-item--nextPage'
-    );
-    const nextPageLink = nextPageItem!.querySelector('.ais-Pagination-link');
+    )!;
+    const nextPageLink = nextPageItem.querySelector<HTMLAnchorElement>(
+      '.ais-Pagination-link'
+    )!;
 
-    userEvent.click(nextPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(nextPageLink);
+    }
 
     const lastPageItem = document.querySelector(
       '.ais-Pagination-item--lastPage'
-    );
-    const lastPageLink = lastPageItem!.querySelector('.ais-Pagination-link');
+    )!;
+    const lastPageLink = lastPageItem.querySelector<HTMLAnchorElement>(
+      '.ais-Pagination-link'
+    )!;
 
-    userEvent.click(lastPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(lastPageLink);
+    }
 
-    const pageOneLink = getByText('1');
+    const pageOneLink = getByText('1') as HTMLAnchorElement;
 
-    userEvent.click(pageOneLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(pageOneLink);
+    }
 
     expect(props.onNavigate).not.toHaveBeenCalled();
   });

@@ -88,16 +88,16 @@ describe('Menu', () => {
     `);
   });
 
-  test('triggers an `onRefine` callback when clicking a link', () => {
+  test('triggers an `onRefine` callback when clicking a link', async () => {
     const props = createProps({});
     const { container } = render(<Menu {...props} />);
 
     const links = container.querySelectorAll('.ais-Menu-link');
     expect(links.length).toBe(2);
 
-    links.forEach((link) => {
-      userEvent.click(link);
-    });
+    for (const link of links) {
+      await userEvent.click(link);
+    }
 
     expect(props.onRefine).toHaveBeenCalledTimes(links.length);
   });
@@ -164,7 +164,7 @@ describe('Menu', () => {
       `);
     });
 
-    test('calls onToggleShowMore', () => {
+    test('calls onToggleShowMore', async () => {
       const props = createProps({});
       const { container } = render(<Menu {...props} showMore />);
 
@@ -172,7 +172,7 @@ describe('Menu', () => {
 
       expect(props.onToggleShowMore).not.toHaveBeenCalled();
 
-      userEvent.click(showMore);
+      await userEvent.click(showMore);
 
       expect(props.onToggleShowMore).toHaveBeenCalledTimes(1);
     });

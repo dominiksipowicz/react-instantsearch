@@ -67,14 +67,14 @@ describe('SortBy', () => {
     );
   });
 
-  test('calls an `onChange` callback when selecting an option', () => {
+  test('calls an `onChange` callback when selecting an option', async () => {
     const props = createProps({});
 
     const onChange = jest.fn();
     const { getByRole } = render(<SortBy {...props} onChange={onChange} />);
 
-    userEvent.selectOptions(
-      document.querySelector('.ais-SortBy-select') as HTMLSelectElement,
+    await userEvent.selectOptions(
+      document.querySelector<HTMLSelectElement>('.ais-SortBy-select')!,
       getByRole('option', { name: 'Price (asc)' })
     );
 

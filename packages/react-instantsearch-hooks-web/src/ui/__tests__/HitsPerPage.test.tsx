@@ -130,16 +130,16 @@ describe('HitsPerPage', () => {
     ).toBe(false);
   });
 
-  test('calls `onChange` when selecting an option', () => {
+  test('calls `onChange` when selecting an option', async () => {
     const props = createProps();
     const { getByRole } = render(<HitsPerPage {...props} />);
 
-    userEvent.selectOptions(getByRole('combobox'), ['10']);
+    await userEvent.selectOptions(getByRole('combobox'), ['10']);
 
     expect(props.onChange).toHaveBeenCalledTimes(1);
     expect(props.onChange).toHaveBeenLastCalledWith(10);
 
-    userEvent.selectOptions(getByRole('combobox'), ['20']);
+    await userEvent.selectOptions(getByRole('combobox'), ['20']);
 
     expect(props.onChange).toHaveBeenCalledTimes(2);
     expect(props.onChange).toHaveBeenLastCalledWith(20);

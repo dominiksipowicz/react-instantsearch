@@ -267,7 +267,7 @@ describe('Menu', () => {
 
     expect(firstItem.parentElement).not.toHaveClass('ais-Menu-item--selected');
 
-    userEvent.click(firstItem);
+    await userEvent.click(firstItem);
 
     await wait(0);
 
@@ -582,7 +582,7 @@ describe('Menu', () => {
         'Incipio n',
       ]);
 
-      userEvent.click(await findByText('Hamilton Beach n'));
+      await userEvent.click(await findByText('Hamilton Beach n'));
 
       await wait(0);
 
@@ -603,7 +603,7 @@ describe('Menu', () => {
         'Incipio n',
       ]);
 
-      userEvent.click(await findByText('Frigidaire n'));
+      await userEvent.click(await findByText('Frigidaire n'));
 
       await wait(0);
 
@@ -882,7 +882,7 @@ describe('Menu', () => {
         </div>
       `);
 
-      userEvent.click(showMoreButton);
+      await userEvent.click(showMoreButton);
 
       await wait(0);
 
@@ -1507,8 +1507,8 @@ describe('Menu', () => {
         </div>
       `);
 
-      userEvent.click(
-        container.querySelector('.ais-Menu-showMore') as HTMLButtonElement
+      await userEvent.click(
+        container.querySelector<HTMLButtonElement>('.ais-Menu-showMore')!
       );
 
       await wait(0);

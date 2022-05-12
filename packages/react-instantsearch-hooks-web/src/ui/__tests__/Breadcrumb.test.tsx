@@ -168,11 +168,11 @@ describe('Breadcrumb', () => {
     `);
   });
 
-  test('calls an `onNavigate` callback when selecting an item', () => {
+  test('calls an `onNavigate` callback when selecting an item', async () => {
     const props = createProps();
     render(<Breadcrumb {...props} />);
 
-    userEvent.click(
+    await userEvent.click(
       document.querySelector(
         '.ais-Breadcrumb-link[href="#Audio"]'
       ) as HTMLAnchorElement

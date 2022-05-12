@@ -29,18 +29,18 @@ describe('ShowMoreButton', () => {
     `);
   });
 
-  test('forwards an `onClick` callback', () => {
+  test('forwards an `onClick` callback', async () => {
     const onClick = jest.fn();
     const { getByRole } = render(
       <ShowMoreButton isShowingMore={false} onClick={onClick} />
     );
 
-    userEvent.click(getByRole('button'));
+    await userEvent.click(getByRole('button'));
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  test('disables the button', () => {
+  test('disables the button', async () => {
     const onClick = jest.fn();
     const { container, getByRole } = render(
       <ShowMoreButton isShowingMore={false} disabled={true} onClick={onClick} />
@@ -56,7 +56,7 @@ describe('ShowMoreButton', () => {
       </div>
     `);
 
-    userEvent.click(getByRole('button'));
+    await userEvent.click(getByRole('button'));
 
     expect(onClick).not.toHaveBeenCalled();
   });

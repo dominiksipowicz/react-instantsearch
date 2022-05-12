@@ -1,4 +1,6 @@
 module.exports = {
+  testRunner: 'jest-circus',
+  testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
     '@testing-library/jest-dom/extend-expect',
     './scripts/jest/setupTests.ts',
@@ -9,7 +11,6 @@ module.exports = {
     '/__utils__/',
   ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
-  testEnvironment: 'jsdom',
   watchPlugins: [
     'jest-watch-typeahead/filename',
     'jest-watch-typeahead/testname',

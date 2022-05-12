@@ -423,28 +423,26 @@ describe('Pagination', () => {
 
     const firstPageItem = document.querySelector(
       '.ais-Pagination-item--firstPage'
-    );
+    )!;
     const previousPageItem = document.querySelector(
       '.ais-Pagination-item--previousPage'
-    );
+    )!;
     const nextPageItem = document.querySelector(
       '.ais-Pagination-item--nextPage'
-    );
+    )!;
     const lastPageItem = document.querySelector(
       '.ais-Pagination-item--lastPage'
-    );
+    )!;
 
     // We're on page 1, "First" and "Previous" links are disabled
     expect(firstPageItem).toHaveClass('ais-Pagination-item--disabled');
     expect(previousPageItem).toHaveClass('ais-Pagination-item--disabled');
 
-    userEvent.click(
-      firstPageItem!.querySelector('.ais-Pagination-link') as HTMLAnchorElement
+    await userEvent.click(
+      firstPageItem.querySelector<HTMLAnchorElement>('.ais-Pagination-link')!
     );
-    userEvent.click(
-      previousPageItem!.querySelector(
-        '.ais-Pagination-link'
-      ) as HTMLAnchorElement
+    await userEvent.click(
+      previousPageItem.querySelector<HTMLAnchorElement>('.ais-Pagination-link')!
     );
 
     await wait(0);
@@ -452,7 +450,7 @@ describe('Pagination', () => {
     expect(search).not.toHaveBeenCalled();
 
     // We navigate to page 2
-    userEvent.click(getByText('2'));
+    await userEvent.click(getByText('2'));
 
     await wait(0);
 
@@ -599,7 +597,7 @@ describe('Pagination', () => {
     `);
 
     // We click on "Next" link
-    userEvent.click(getByText('›'));
+    await userEvent.click(getByText('›'));
 
     await wait(0);
 
@@ -746,7 +744,7 @@ describe('Pagination', () => {
     `);
 
     // We click on "Last" link
-    userEvent.click(getByText('››'));
+    await userEvent.click(getByText('››'));
 
     await wait(0);
 
@@ -896,11 +894,11 @@ describe('Pagination', () => {
     expect(nextPageItem).toHaveClass('ais-Pagination-item--disabled');
     expect(lastPageItem).toHaveClass('ais-Pagination-item--disabled');
 
-    userEvent.click(
-      nextPageItem!.querySelector('.ais-Pagination-link') as HTMLAnchorElement
+    await userEvent.click(
+      nextPageItem.querySelector<HTMLAnchorElement>('.ais-Pagination-link')!
     );
-    userEvent.click(
-      lastPageItem!.querySelector('.ais-Pagination-link') as HTMLAnchorElement
+    await userEvent.click(
+      lastPageItem.querySelector<HTMLAnchorElement>('.ais-Pagination-link')!
     );
 
     await wait(0);
@@ -908,10 +906,8 @@ describe('Pagination', () => {
     expect(search).not.toHaveBeenCalled();
 
     // We click on "Previous" link
-    userEvent.click(
-      previousPageItem!.querySelector(
-        '.ais-Pagination-link'
-      ) as HTMLAnchorElement
+    await userEvent.click(
+      previousPageItem.querySelector<HTMLAnchorElement>('.ais-Pagination-link')!
     );
 
     await wait(0);
@@ -1059,8 +1055,8 @@ describe('Pagination', () => {
     `);
 
     // We click on "First" link
-    userEvent.click(
-      firstPageItem!.querySelector('.ais-Pagination-link') as HTMLAnchorElement
+    await userEvent.click(
+      firstPageItem.querySelector<HTMLAnchorElement>('.ais-Pagination-link')!
     );
 
     await wait(0);

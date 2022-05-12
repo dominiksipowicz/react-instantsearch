@@ -1,5 +1,9 @@
+import { TextEncoder } from 'util';
 import { warnCache } from '../../packages/react-instantsearch-hooks/src/lib/warn';
 import { toWarnDev } from './matchers';
+
+// This makes tests runnable for React InstantSearch Core.
+global.TextEncoder = TextEncoder;
 
 expect.extend({ toWarnDev });
 

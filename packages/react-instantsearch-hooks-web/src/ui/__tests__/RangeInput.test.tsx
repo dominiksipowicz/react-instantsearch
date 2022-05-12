@@ -146,27 +146,27 @@ describe('RangeInput', () => {
     });
   });
 
-  test('calls `onSubmit` callback when submitting form', () => {
+  test('calls `onSubmit` callback when submitting form', async () => {
     const props = createProps({ start: [100, 1000] });
     const { container } = render(<RangeInput {...props} />);
 
-    userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
+    await userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
 
     expect(props.onSubmit).toHaveBeenCalledTimes(1);
     expect(props.onSubmit).toHaveBeenLastCalledWith([100, 1000]);
 
-    userEvent.type(
+    await userEvent.type(
       container.querySelector('.ais-RangeInput-input--min')!,
       '500',
       { initialSelectionStart: 0 }
     );
-    userEvent.type(
+    await userEvent.type(
       container.querySelector('.ais-RangeInput-input--max')!,
       '5000',
       { initialSelectionStart: 0 }
     );
 
-    userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
+    await userEvent.click(container.querySelector('.ais-RangeInput-submit')!);
 
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
     expect(props.onSubmit).toHaveBeenLastCalledWith([500, 5000]);

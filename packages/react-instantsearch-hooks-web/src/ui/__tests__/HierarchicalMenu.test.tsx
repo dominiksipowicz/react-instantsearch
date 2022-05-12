@@ -149,12 +149,12 @@ describe('HierarchicalMenu', () => {
     `);
   });
 
-  test('triggers an `onNavigate` callback when clicking a checkbox', () => {
+  test('triggers an `onNavigate` callback when clicking a checkbox', async () => {
     const props = createProps();
     const { container } = render(<HierarchicalMenu {...props} />);
 
-    userEvent.click(
-      container.querySelector('[href="#iPad"]') as HTMLAnchorElement
+    await userEvent.click(
+      container.querySelector<HTMLAnchorElement>('[href="#iPad"]')!
     );
 
     expect(props.onNavigate).toHaveBeenCalledTimes(1);
@@ -265,7 +265,7 @@ describe('HierarchicalMenu', () => {
       `);
     });
 
-    test('calls onToggleShowMore', () => {
+    test('calls onToggleShowMore', async () => {
       const props = createProps();
       const { container } = render(<HierarchicalMenu {...props} showMore />);
 
@@ -275,7 +275,7 @@ describe('HierarchicalMenu', () => {
 
       expect(props.onToggleShowMore).not.toHaveBeenCalled();
 
-      userEvent.click(showMore);
+      await userEvent.click(showMore);
 
       expect(props.onToggleShowMore).toHaveBeenCalledTimes(1);
     });
