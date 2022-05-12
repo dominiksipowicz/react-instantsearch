@@ -1231,57 +1231,73 @@ describe('Pagination', () => {
 
     const firstPageItem = document.querySelector(
       '.ais-Pagination-item--firstPage'
-    );
-    const firstPageLink = firstPageItem!.querySelector('.ais-Pagination-link');
+    )!;
+    const firstPageLink = firstPageItem.querySelector<HTMLAnchorElement>(
+      '.ais-Pagination-link'
+    )!;
 
-    userEvent.click(firstPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(firstPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(firstPageLink);
+    }
 
     const previousPageItem = document.querySelector(
       '.ais-Pagination-item--previousPage'
-    );
-    const previousPageLink = previousPageItem!.querySelector(
+    )!;
+    const previousPageLink = previousPageItem.querySelector<HTMLAnchorElement>(
       '.ais-Pagination-link'
-    );
+    )!;
 
-    userEvent.click(previousPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(previousPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(previousPageLink);
+    }
 
     const nextPageItem = document.querySelector(
       '.ais-Pagination-item--nextPage'
-    );
-    const nextPageLink = nextPageItem!.querySelector('.ais-Pagination-link');
+    )!;
+    const nextPageLink = nextPageItem.querySelector<HTMLAnchorElement>(
+      '.ais-Pagination-link'
+    )!;
 
-    userEvent.click(nextPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(nextPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(nextPageLink);
+    }
 
     const lastPageItem = document.querySelector(
       '.ais-Pagination-item--lastPage'
-    );
-    const lastPageLink = lastPageItem!.querySelector('.ais-Pagination-link');
+    )!;
+    const lastPageLink = lastPageItem.querySelector<HTMLAnchorElement>(
+      '.ais-Pagination-link'
+    )!;
 
-    userEvent.click(lastPageLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(lastPageLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(lastPageLink);
+    }
 
-    const pageOneLink = getByText('1');
+    const pageOneLink = getByText('1') as HTMLAnchorElement;
 
-    userEvent.click(pageOneLink as HTMLAnchorElement, { button: 1 });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { altKey: true });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { ctrlKey: true });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { metaKey: true });
-    userEvent.click(pageOneLink as HTMLAnchorElement, { shiftKey: true });
+    {
+      const user = userEvent.setup();
+      await user.keyboard(
+        '[ControlLeft>][ControlRight>][MetaLeft>][MetaRight>][ShiftLeft>][ShiftRight>][AltLeft>][AltRight>]'
+      );
+      await user.click(pageOneLink);
+    }
 
     expect(search).not.toHaveBeenCalled();
   });
