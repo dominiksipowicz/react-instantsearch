@@ -1,7 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { history } from 'instantsearch.js/es/lib/routers';
 import { simple } from 'instantsearch.js/es/lib/stateMappings';
-import React from 'react';
+import React, { useReducer } from 'react';
 import { Hits, SearchBox } from 'react-instantsearch-hooks-web';
 
 import { createSearchClient } from '../../../../../test/mock';
@@ -252,5 +253,77 @@ describe('InstantSearchSSRProvider', () => {
     await wait(0);
 
     expect(searchClient.search).toHaveBeenCalledTimes(0);
+  });
+
+  test('supports state changes with `onStateChange` after a re-render', async () => {
+    const searchClient = createSearchClient({});
+    const initialResults = {
+      indexName: {
+        state: {},
+        results: [
+          {
+            exhaustiveFacetsCount: true,
+            exhaustiveNbHits: true,
+            hits: [{ objectID: '1' }, { objectID: '2' }, { objectID: '3' }],
+            hitsPerPage: 20,
+            index: 'indexName',
+            nbHits: 0,
+            nbPages: 0,
+            page: 0,
+            params: '',
+            processingTimeMS: 0,
+            query: '',
+          },
+        ],
+      },
+    };
+
+    function Search() {
+      return (
+        <InstantSearchSSRProvider initialResults={initialResults}>
+          <InstantSearch
+            searchClient={searchClient}
+            indexName="indexName"
+            onStateChange={({ uiState, setUiState }) => {
+              setUiState(uiState);
+            }}
+          >
+            <SearchBox />
+            <Hits hitComponent={Hit} />
+          </InstantSearch>
+        </InstantSearchSSRProvider>
+      );
+    }
+
+    function App() {
+      const [, rerender] = useReducer<number, void>((x) => x + 1, 0);
+
+      return (
+        <>
+          <Search />
+          <button
+            onClick={() => {
+              rerender();
+            }}
+          >
+            Rerender
+          </button>
+        </>
+      );
+    }
+
+    const { getByText } = render(<App />);
+
+    await wait(0);
+
+    expect(searchClient.search).toHaveBeenCalledTimes(0);
+
+    userEvent.click(getByText('Rerender'));
+
+    // @TODO: This throws:
+    // > The `start` method needs to be called before `setUiState`.
+    userEvent.type(screen.getByRole('searchbox'), 'i');
+
+    expect(searchClient.search).toHaveBeenCalledTimes(1);
   });
 });
