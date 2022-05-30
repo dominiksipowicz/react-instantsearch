@@ -60,6 +60,8 @@ describe('InstantSearchSSRProvider', () => {
       },
     };
 
+    // @TODO: also mount a <RefinementList> to make sure refinements render too.
+
     function App() {
       return (
         <InstantSearchSSRProvider initialResults={initialResults}>

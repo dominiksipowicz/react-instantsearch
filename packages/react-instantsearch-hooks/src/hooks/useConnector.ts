@@ -1,11 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 import { createSearchResults } from '../lib/createSearchResults';
 import { dequal } from '../lib/dequal';
 import { useIndexContext } from '../lib/useIndexContext';
 import { useInstantSearchContext } from '../lib/useInstantSearchContext';
 import { useInstantSearchServerContext } from '../lib/useInstantSearchServerContext';
-import { useIsomorphicLayoutEffect } from '../lib/useIsomorphicLayoutEffect';
 import { useStableValue } from '../lib/useStableValue';
 
 import type { Connector, Widget, WidgetDescription } from 'instantsearch.js';
@@ -88,20 +88,8 @@ export function useConnector<
       ...stableAdditionalWidgetProperties,
     };
 
-    // On the server, we add the widget early in the memo to retrieve its search
-    // parameters in the render pass.
-    if (serverContext) {
-      parentIndex.addWidgets([instance]);
-    }
-
     return instance;
-  }, [
-    connector,
-    parentIndex,
-    serverContext,
-    stableProps,
-    stableAdditionalWidgetProperties,
-  ]);
+  }, [connector, stableProps, stableAdditionalWidgetProperties]);
 
   const [state, setState] = useState<TDescription['renderState']>(() => {
     if (widget.getWidgetRenderState) {
@@ -159,15 +147,23 @@ export function useConnector<
     return {};
   });
 
-  // Using a layout effect adds the widget at the same time as rendering, which
-  // triggers a single network request, instead of two with a regular effect.
-  useIsomorphicLayoutEffect(() => {
+  const store = useSyncExternalStore(
+    useCallback(() => {
+      parentIndex.addWidgets([widget]);
+
+      return () => {
+        parentIndex.removeWidgets([widget]);
+      };
+    }, [parentIndex, widget]),
+    () => state,
+    () => state
+  );
+
+  // On the server, we add the widget early to retrieve its search parameters
+  // in the render pass.
+  if (serverContext) {
     parentIndex.addWidgets([widget]);
+  }
 
-    return () => {
-      parentIndex.removeWidgets([widget]);
-    };
-  }, [widget, parentIndex]);
-
-  return state;
+  return store;
 }
