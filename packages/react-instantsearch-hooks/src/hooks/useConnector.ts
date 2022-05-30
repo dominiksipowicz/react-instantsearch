@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
+import { useMemo, useRef, useState } from 'react';
 
 import { createSearchResults } from '../lib/createSearchResults';
 import { dequal } from '../lib/dequal';
 import { useIndexContext } from '../lib/useIndexContext';
 import { useInstantSearchContext } from '../lib/useInstantSearchContext';
 import { useInstantSearchServerContext } from '../lib/useInstantSearchServerContext';
+import { useIsomorphicLayoutEffect } from '../lib/useIsomorphicLayoutEffect';
 import { useStableValue } from '../lib/useStableValue';
 
 import type { Connector, Widget, WidgetDescription } from 'instantsearch.js';
@@ -88,8 +88,20 @@ export function useConnector<
       ...stableAdditionalWidgetProperties,
     };
 
+    // On the server, we add the widget early to retrieve its search parameters
+    // in the render pass.
+    if (serverContext) {
+      parentIndex.addWidgets([instance]);
+    }
+
     return instance;
-  }, [connector, stableProps, stableAdditionalWidgetProperties]);
+  }, [
+    connector,
+    stableProps,
+    stableAdditionalWidgetProperties,
+    serverContext,
+    parentIndex,
+  ]);
 
   const [state, setState] = useState<TDescription['renderState']>(() => {
     if (widget.getWidgetRenderState) {
@@ -147,23 +159,13 @@ export function useConnector<
     return {};
   });
 
-  const store = useSyncExternalStore(
-    useCallback(() => {
-      parentIndex.addWidgets([widget]);
-
-      return () => {
-        parentIndex.removeWidgets([widget]);
-      };
-    }, [parentIndex, widget]),
-    () => state,
-    () => state
-  );
-
-  // On the server, we add the widget early to retrieve its search parameters
-  // in the render pass.
-  if (serverContext) {
+  useIsomorphicLayoutEffect(() => {
     parentIndex.addWidgets([widget]);
-  }
 
-  return store;
+    return () => {
+      parentIndex.removeWidgets([widget]);
+    };
+  }, [parentIndex, widget]);
+
+  return state;
 }

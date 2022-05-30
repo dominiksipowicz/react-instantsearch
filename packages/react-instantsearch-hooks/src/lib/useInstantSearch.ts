@@ -64,17 +64,15 @@ export function useInstantSearch<TUiState extends UiState, TRouteState>(
 
   const store = useSyncExternalStore<InstantSearch<TUiState, TRouteState>>(
     useCallback(() => {
-      // setTimeout(() => {
       search.start();
       forceUpdate();
-      // });
 
       return () => {
         search.dispose();
       };
     }, [forceUpdate, search]),
     () => search,
-    () => search // @TODO check if that's what's expected on the server
+    () => search
   );
 
   if (serverContext && !search.started) {
