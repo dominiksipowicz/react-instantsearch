@@ -123,7 +123,7 @@ describe('InstantSearch', () => {
     expect(searchContext!.started).toEqual(true);
   });
 
-  test('disposes the search on unmount', () => {
+  test('disposes the search on unmount', async () => {
     const searchClient = createSearchClient({});
     let searchContext: InstantSearchType | null = null;
 
@@ -140,7 +140,9 @@ describe('InstantSearch', () => {
 
     unmount();
 
-    expect(searchContext!.started).toEqual(false);
+    await waitFor(() => {
+      expect(searchContext!.started).toEqual(false);
+    });
   });
 
   test('triggers a single network request on mount with widgets', async () => {

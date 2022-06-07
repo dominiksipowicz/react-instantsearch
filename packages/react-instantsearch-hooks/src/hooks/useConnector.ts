@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { createSearchResults } from '../lib/createSearchResults';
 import { dequal } from '../lib/dequal';
@@ -145,11 +145,55 @@ export function useConnector<
     return {};
   });
 
+  const prevPropsRef = useRef<TProps>(stableProps);
+  useEffect(() => {
+    prevPropsRef.current = stableProps;
+  }, [stableProps]);
+
+  const prevWidgetRef = useRef<Widget>(widget);
+  useEffect(() => {
+    prevWidgetRef.current = widget;
+  }, [widget]);
+
+  const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // This effect is responsible for adding, removing, and updating the widget.
+  // We need to support scenarios where the widget is remounted quickly, like in
+  // Strict Mode, so that we don't lose its state, and therefore that we don't
+  // break routing.
   useIsomorphicLayoutEffect(() => {
-    parentIndex.addWidgets([widget]);
+    const previousWidget = prevWidgetRef.current;
+    function cleanup() {
+      parentIndex.removeWidgets([previousWidget]);
+    }
+
+    // Scenario 1: the widget is added for the first time.
+    if (cleanupTimerRef.current === null) {
+      parentIndex.addWidgets([widget]);
+    }
+    // Scenario 2: the widget is updated or added after the effect cleanup function.
+    else {
+      // We cancel the original effect cleanup because it's not necessary if
+      // props haven't changed.
+      clearTimeout(cleanupTimerRef.current);
+
+      // Warning: if an unstable function prop is provided, it's not able to
+      // keep its reference and therefore will consider that props did change.
+      const arePropsEqual = dequal(stableProps, prevPropsRef.current);
+
+      // If props did change, then we execute the cleanup function instantly
+      // and then add the widget back. This lets us add the widget without
+      // waiting for the scheduled cleanup function to finish.
+      if (!arePropsEqual) {
+        cleanup();
+        parentIndex.addWidgets([widget]);
+      }
+    }
 
     return () => {
-      parentIndex.removeWidgets([widget]);
+      // We don't remove the widget right away, but rather schedule it so that
+      // we're able to cancel it in the next effect.
+      cleanupTimerRef.current = setTimeout(cleanup);
     };
   }, [parentIndex, widget]);
 

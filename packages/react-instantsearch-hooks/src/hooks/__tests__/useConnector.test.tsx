@@ -1,8 +1,8 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 import { SearchParameters, SearchResults } from 'algoliasearch-helper';
 import connectHits from 'instantsearch.js/es/connectors/hits/connectHits';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   createSearchClient,
@@ -183,6 +183,52 @@ const connectUnstableSearchBox: Connector<
       },
       getWidgetSearchParameters(searchParameters, { uiState }) {
         return searchParameters.setQueryParameter('query', uiState.query || '');
+      },
+    };
+  };
+
+type CustomWidgetParams = {
+  attribute: string;
+};
+
+type CustomWidgetDescription = {
+  $$type: 'test.customWidget';
+  renderState: Record<string, any>;
+};
+
+const connectCustomWidget: Connector<
+  CustomWidgetDescription,
+  CustomWidgetParams
+> =
+  (renderFn, unmountFn = noop) =>
+  (widgetParams) => {
+    return {
+      $$type: 'test.customWidget',
+      init(params) {
+        renderFn(
+          {
+            ...this.getWidgetRenderState!(params),
+            instantSearchInstance: params.instantSearchInstance,
+          },
+          true
+        );
+      },
+      render(params) {
+        renderFn(
+          {
+            ...this.getWidgetRenderState!(params),
+            instantSearchInstance: params.instantSearchInstance,
+          },
+          false
+        );
+      },
+      dispose() {
+        unmountFn();
+      },
+      getWidgetRenderState() {
+        return {
+          widgetParams,
+        };
       },
     };
   };
@@ -438,7 +484,7 @@ describe('useConnector', () => {
     `);
   });
 
-  test('adds the widget to the parent index', () => {
+  test('adds the widget to the parent index', async () => {
     const searchClient = createSearchClient({});
     let indexContext: IndexWidget | null = null;
 
@@ -492,7 +538,9 @@ describe('useConnector', () => {
 
     unmount();
 
-    expect(indexContext!.removeWidgets).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(indexContext!.removeWidgets).toHaveBeenCalledTimes(1)
+    );
     expect(indexContext!.removeWidgets).toHaveBeenCalledWith(
       expect.arrayContaining([
         expect.objectContaining({
@@ -536,9 +584,62 @@ describe('useConnector', () => {
 
     await wait(0);
 
-    // This checks that InstantSearch doesn't re-render endlessly. We should
-    // still be able to optimize this render count to `1`, but `2` is acceptable
-    // for now compared to an infinite loop.
-    expect(searchClient.search).toHaveBeenCalledTimes(2);
+    expect(searchClient.search).toHaveBeenCalledTimes(1);
+  });
+
+  test('re-renders the widget on prop changes', async () => {
+    const searchClient = createSearchClient({});
+
+    function CustomWidget(props: CustomWidgetParams) {
+      useConnector(connectCustomWidget, props);
+      return null;
+    }
+
+    function App({ attribute }) {
+      return (
+        <InstantSearch searchClient={searchClient} indexName="indexName">
+          <CustomWidget attribute={attribute} />
+        </InstantSearch>
+      );
+    }
+
+    const { rerender } = render(<App attribute="brands" />);
+
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+
+    rerender(<App attribute="categories" />);
+
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
+  });
+
+  test('re-renders the widget on prop changes 2', async () => {
+    const searchClient = createSearchClient({});
+
+    function CustomWidget(props: CustomWidgetParams) {
+      useConnector(connectCustomWidget, props);
+      return null;
+    }
+
+    function App() {
+      const [attribute, setAttribute] = useState('brands');
+
+      return (
+        <InstantSearch searchClient={searchClient} indexName="indexName">
+          <CustomWidget attribute={attribute} />
+          <button onClick={() => setAttribute('categories')}>
+            Change attribute
+          </button>
+        </InstantSearch>
+      );
+    }
+
+    const { getByRole } = render(<App />);
+    const button = getByRole('button');
+
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+
+    button.click();
+
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
   });
 });
