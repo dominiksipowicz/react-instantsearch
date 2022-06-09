@@ -182,23 +182,13 @@ function getInitialResults(rootIndex: IndexWidget): InitialResults {
 }
 
 function importRenderToString() {
-  return Promise.all([
-    // React pre-18 doesn't use `exports` in package.json, requiring a fully resolved path
-    // Thus, only one of these imports is correct
-    // eslint-disable-next-line import/extensions
-    import('react-dom/server.js').catch(() => {}),
-    import('react-dom/server').catch(() => {}),
-  ]).then((imports) => {
-    const ReactDOMServer = (
-      imports as Array<{
-        renderToString: typeof reactRenderToString;
-      }>
-    ).find((mod) => mod !== undefined);
-
-    if (!ReactDOMServer) {
-      throw new Error('Could not import ReactDOMServer.');
-    }
-
-    return ReactDOMServer.renderToString;
-  });
+  return (
+    // React pre-18 doesn't use `exports` in package.json, requiring a fully resolved path.
+    (
+      React.version.startsWith('16.') || React.version.startsWith('17.')
+        ? // eslint-disable-next-line import/extensions
+          import('react-dom/server.js')
+        : import('react-dom/server')
+    ).then((mod) => mod.renderToString)
+  );
 }
