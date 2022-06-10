@@ -1,5 +1,3 @@
-/* eslint-disable jest/expect-expect */
-
 import { render, waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 import { SearchParameters, SearchResults } from 'algoliasearch-helper';
@@ -473,19 +471,17 @@ describe('useConnector', () => {
     `);
   });
 
-  async function runWidgetLifecycleTest({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('runs the widget lifecycle', async () => {
     const searchClient = createSearchClient({});
     const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
     function App() {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomSearchBox />
           </InstantSearchSpy>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -519,21 +515,9 @@ describe('useConnector', () => {
       ])
     );
     expect(indexContext.current!.getWidgets()).toEqual([]);
-  }
-
-  test('runs the widget lifecycle', async () => {
-    await runWidgetLifecycleTest();
-  });
-  test('[Strict Mode] runs the widget lifecycle', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await runWidgetLifecycleTest({ Wrapper });
   });
 
-  async function testRenderCountWithUnstableFunctionFromRenderState({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('limits the number of renders with unstable function references from render state', async () => {
     const searchClient = createSearchClient({});
 
     function Hits(props) {
@@ -556,27 +540,17 @@ describe('useConnector', () => {
 
     function App() {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearch searchClient={searchClient} indexName="indexName">
             <Search />
           </InstantSearch>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
     render(<App />);
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
-  }
-
-  test('limits the number of renders with unstable function references from render state', async () => {
-    await testRenderCountWithUnstableFunctionFromRenderState();
-  });
-  test('[Strict Mode] limits the number of renders with unstable function references from render state', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await testRenderCountWithUnstableFunctionFromRenderState({ Wrapper });
   });
 
   function CustomWidget(props: CustomWidgetParams) {
@@ -584,19 +558,17 @@ describe('useConnector', () => {
     return <div data-testid="attribute">{props.attribute}</div>;
   }
 
-  async function testRerenderOnPropChange({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('rerenders the widget on prop change', async () => {
     const searchClient = createSearchClient({});
     const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
     function App({ attribute }) {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomWidget attribute={attribute} />
           </InstantSearchSpy>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -612,21 +584,9 @@ describe('useConnector', () => {
     expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(1);
     expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(2);
     expect(getByTestId('attribute')).toHaveTextContent('categories');
-  }
-
-  test('rerenders the widget on prop change', async () => {
-    await testRerenderOnPropChange();
-  });
-  test('[Strict Mode] rerenders the widget on prop change', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await testRerenderOnPropChange({ Wrapper });
   });
 
-  async function testRerenderOnStateChange({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('rerenders the widget on state change', async () => {
     const searchClient = createSearchClient({});
     const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
@@ -634,14 +594,14 @@ describe('useConnector', () => {
       const [attribute, setAttribute] = useState('brands');
 
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomWidget attribute={attribute} />
             <button onClick={() => setAttribute('categories')}>
               Change attribute
             </button>
           </InstantSearchSpy>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -658,31 +618,21 @@ describe('useConnector', () => {
     expect(getByTestId('attribute')).toHaveTextContent('categories');
     expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(1);
     expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(2);
-  }
-
-  test('rerenders the widget on state change', async () => {
-    await testRerenderOnStateChange();
-  });
-  test('[Strict Mode] rerenders the widget on state change', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await testRerenderOnStateChange({ Wrapper });
   });
 
-  async function testRerenderWithUnstableFunctionProp({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  // Ideally we would like to avoid this behavior, but we don't have any way
+  // to memo function props, so they're always considered as new reference.
+  test('always removes/adds the widget on rerenders when using an unstable function prop', async () => {
     const searchClient = createSearchClient({});
     const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
     function App({ callback }) {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomWidget callback={callback} />
           </InstantSearchSpy>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -696,17 +646,5 @@ describe('useConnector', () => {
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
     expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(1);
     expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(2);
-  }
-
-  // Ideally we would like to avoid this behavior, but we don't have any way
-  // to memo function props, so they're always considered as new reference.
-  test('always removes/adds the widget on rerenders when using an unstable function prop', async () => {
-    await testRerenderWithUnstableFunctionProp();
-  });
-  test('[Strict Mode] always removes/adds the widget on rerenders when using an unstable function prop', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await testRerenderWithUnstableFunctionProp({ Wrapper });
   });
 });

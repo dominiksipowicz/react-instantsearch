@@ -1,5 +1,3 @@
-/* eslint-disable jest/expect-expect */
-
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { history } from 'instantsearch.js/es/lib/routers';
@@ -10,15 +8,11 @@ import { SearchBox } from 'react-instantsearch-hooks-web';
 import { createSearchClient } from '../../../../../test/mock';
 import { createInstantSearchSpy } from '../../../../../test/utils';
 import { useRefinementList } from '../../connectors/useRefinementList';
-import { IndexContext } from '../../lib/IndexContext';
-import { InstantSearchContext } from '../../lib/InstantSearchContext';
 import version from '../../version';
 import { Index } from '../Index';
 import { InstantSearch } from '../InstantSearch';
 
 import type { UseRefinementListProps } from '../../connectors/useRefinementList';
-import type { InstantSearch as InstantSearchType } from 'instantsearch.js';
-import type { IndexWidget } from 'instantsearch.js/es/widgets/index/index';
 
 function RefinementList(props: UseRefinementListProps) {
   useRefinementList(props);
@@ -157,20 +151,18 @@ describe('InstantSearch', () => {
     expect(searchContext.current!.started).toEqual(false);
   });
 
-  async function runSearchCallOnRenderTest({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('triggers a single network request on mount with widgets', async () => {
     const searchClient = createSearchClient({});
 
     render(
-      <Wrapper>
+      <StrictMode>
         <InstantSearch indexName="indexName" searchClient={searchClient}>
           <SearchBox />
           <Index indexName="subIndexName">
             <RefinementList attribute="brand" />
           </Index>
         </InstantSearch>
-      </Wrapper>
+      </StrictMode>
     );
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
@@ -190,25 +182,13 @@ describe('InstantSearch', () => {
         },
       },
     ]);
-  }
-
-  test('triggers a single network request on mount with widgets', async () => {
-    await runSearchCallOnRenderTest();
-  });
-  test('[Strict Mode] triggers a single network request on mount with widgets', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await runSearchCallOnRenderTest({ Wrapper });
   });
 
-  async function runSuspenseBoundaryTest({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('renders components within a Suspense boundary', async () => {
     const searchClient = createSearchClient({});
 
     render(
-      <Wrapper>
+      <StrictMode>
         <InstantSearch indexName="indexName" searchClient={searchClient}>
           <SearchBox />
           <Suspense fallback={null}>
@@ -217,7 +197,7 @@ describe('InstantSearch', () => {
             </Index>
           </Suspense>
         </InstantSearch>
-      </Wrapper>
+      </StrictMode>
     );
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
@@ -237,21 +217,9 @@ describe('InstantSearch', () => {
         },
       },
     ]);
-  }
-
-  test('renders components within a Suspense boundary', async () => {
-    await runSuspenseBoundaryTest();
-  });
-  test('[Strict Mode] renders components within a Suspense boundary', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await runSuspenseBoundaryTest({ Wrapper });
   });
 
-  async function runRenderWithRouterStateTest({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('renders with router state', async () => {
     const searchClient = createSearchClient({});
     const routing = {
       stateMapping: simple(),
@@ -266,7 +234,7 @@ describe('InstantSearch', () => {
 
     function App() {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearch
             searchClient={searchClient}
             indexName="indexName"
@@ -274,7 +242,7 @@ describe('InstantSearch', () => {
           >
             <SearchBox />
           </InstantSearch>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -309,30 +277,18 @@ describe('InstantSearch', () => {
       ]);
       expect(screen.getByRole('searchbox')).toHaveValue('iphone case');
     });
-  }
-
-  test('renders with router state', async () => {
-    await runRenderWithRouterStateTest();
-  });
-  test('[Strict Mode] renders with router state', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await runRenderWithRouterStateTest({ Wrapper });
   });
 
-  async function runRecoverStateOnRerenderTest({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('recovers the state on rerender', async () => {
     const searchClient = createSearchClient({});
 
     function App() {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearch searchClient={searchClient} indexName="indexName">
             <SearchBox />
           </InstantSearch>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -373,21 +329,9 @@ describe('InstantSearch', () => {
         },
       ]);
     });
-  }
-
-  test('recovers the state on rerender', async () => {
-    await runRecoverStateOnRerenderTest();
-  });
-  test('[Strict Mode] recovers the state on rerender', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await runRecoverStateOnRerenderTest({ Wrapper });
   });
 
-  async function runRecoverStateOnRerenderWithStableFunctionTest({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('recovers the state on rerender with a stable onStateChange', async () => {
     const searchClient = createSearchClient({});
     const onStateChange = ({ uiState, setUiState }) => {
       setUiState(uiState);
@@ -395,7 +339,7 @@ describe('InstantSearch', () => {
 
     function App() {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearch
             searchClient={searchClient}
             indexName="indexName"
@@ -403,7 +347,7 @@ describe('InstantSearch', () => {
           >
             <SearchBox />
           </InstantSearch>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -444,30 +388,18 @@ describe('InstantSearch', () => {
         },
       ]);
     });
-  }
-
-  test('recovers the state on rerender with a stable onStateChange', async () => {
-    await runRecoverStateOnRerenderWithStableFunctionTest();
-  });
-  test('[Strict Mode] recovers the state on rerender with a stable onStateChange', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await runRecoverStateOnRerenderWithStableFunctionTest({ Wrapper });
   });
 
   // This test shows that giving an unstable `onStateChange` reference (or any
   // unstable prop) remounts the <InstantSearch> component and therefore resets
   // the state after the remount.
   // Users need to provide stable references for rerenders to keep the state.
-  async function runRecoverStateOnRerenderWithUnstableFunctionTest({
-    Wrapper = ({ children }) => children,
-  } = {}) {
+  test('recovers the state on rerender with an unstable onStateChange', async () => {
     const searchClient = createSearchClient({});
 
     function App() {
       return (
-        <Wrapper>
+        <StrictMode>
           <InstantSearch
             searchClient={searchClient}
             indexName="indexName"
@@ -477,7 +409,7 @@ describe('InstantSearch', () => {
           >
             <SearchBox />
           </InstantSearch>
-        </Wrapper>
+        </StrictMode>
       );
     }
 
@@ -521,15 +453,5 @@ describe('InstantSearch', () => {
         },
       ]);
     });
-  }
-
-  test('recovers the state on rerender with an unstable onStateChange', async () => {
-    await runRecoverStateOnRerenderWithUnstableFunctionTest();
-  });
-  test('[Strict Mode] recovers the state on rerender with an unstable onStateChange', async () => {
-    function Wrapper({ children }) {
-      return <StrictMode>{children}</StrictMode>;
-    }
-    await runRecoverStateOnRerenderWithUnstableFunctionTest({ Wrapper });
   });
 });
