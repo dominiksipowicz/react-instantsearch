@@ -527,7 +527,7 @@ describe('useConnector', () => {
     );
 
     expect(indexContext!.addWidgets).toHaveBeenCalledTimes(1);
-    expect(indexContext!.addWidgets).toHaveBeenCalledWith(
+    expect(indexContext!.addWidgets).toHaveBeenLastCalledWith(
       expect.arrayContaining([
         expect.objectContaining({
           $$type: 'test.searchBox',
@@ -541,7 +541,7 @@ describe('useConnector', () => {
     await waitFor(() =>
       expect(indexContext!.removeWidgets).toHaveBeenCalledTimes(1)
     );
-    expect(indexContext!.removeWidgets).toHaveBeenCalledWith(
+    expect(indexContext!.removeWidgets).toHaveBeenLastCalledWith(
       expect.arrayContaining([
         expect.objectContaining({
           $$type: 'test.searchBox',
@@ -587,12 +587,12 @@ describe('useConnector', () => {
     expect(searchClient.search).toHaveBeenCalledTimes(1);
   });
 
-  test('re-renders the widget on prop changes', async () => {
+  test('re-renders the widget on prop change', async () => {
     const searchClient = createSearchClient({});
 
     function CustomWidget(props: CustomWidgetParams) {
       useConnector(connectCustomWidget, props);
-      return null;
+      return <div data-testid="attribute">{props.attribute}</div>;
     }
 
     function App({ attribute }) {
@@ -603,21 +603,23 @@ describe('useConnector', () => {
       );
     }
 
-    const { rerender } = render(<App attribute="brands" />);
+    const { rerender, getByTestId } = render(<App attribute="brands" />);
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+    expect(getByTestId('attribute')).toHaveTextContent('brands');
 
     rerender(<App attribute="categories" />);
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
+    expect(getByTestId('attribute')).toHaveTextContent('categories');
   });
 
-  test('re-renders the widget on prop changes 2', async () => {
+  test('re-renders the widget on state change', async () => {
     const searchClient = createSearchClient({});
 
     function CustomWidget(props: CustomWidgetParams) {
       useConnector(connectCustomWidget, props);
-      return null;
+      return <div data-testid="attribute">{props.attribute}</div>;
     }
 
     function App() {
@@ -633,13 +635,23 @@ describe('useConnector', () => {
       );
     }
 
-    const { getByRole } = render(<App />);
+    const { getByRole, getByTestId } = render(<App />);
     const button = getByRole('button');
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+    expect(getByTestId('attribute')).toHaveTextContent('brands');
 
     button.click();
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
+    expect(getByTestId('attribute')).toHaveTextContent('categories');
   });
+
+  test.todo('add the widget only once on re-renders');
+  test.todo('removes/adds the widget when widget props change');
+  // Ideally we would like to avoid this behavior, but we don't have any way
+  // to memo function props, so they're always considered as new reference.
+  test.todo(
+    'always removes/adds the widget on re-renders when using an unstable function prop'
+  );
 });
