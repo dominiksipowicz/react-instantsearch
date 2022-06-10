@@ -171,19 +171,24 @@ export function useConnector<
     if (cleanupTimerRef.current === null) {
       parentIndex.addWidgets([widget]);
     }
-    // Scenario 2: the widget is updated or added after the effect cleanup function.
+    // Scenario 2: the widget is rerendered or updated.
     else {
-      // We cancel the original effect cleanup because it's not necessary if
-      // props haven't changed.
+      // We cancel the original effect cleanup because it may not be necessary if
+      // props haven't changed. (We manually call it if it is below.)
       clearTimeout(cleanupTimerRef.current);
 
-      // Warning: if an unstable function prop is provided, it's not able to
-      // keep its reference and therefore will consider that props did change.
+      // Warning: if an unstable function prop is provided, `dequal` is not able
+      // to keep its reference and therefore will consider that props did change.
+      // This could unsollicitely remove/add the widget, therefore forget its state,
+      // and could be a source of confusion.
+      // If users face this issue, we should advise them to provide stable function
+      // references.
       const arePropsEqual = dequal(stableProps, prevPropsRef.current);
 
       // If props did change, then we execute the cleanup function instantly
       // and then add the widget back. This lets us add the widget without
-      // waiting for the scheduled cleanup function to finish.
+      // waiting for the scheduled cleanup function to finish (that we canceled
+      // above).
       if (!arePropsEqual) {
         cleanup();
         parentIndex.addWidgets([widget]);
