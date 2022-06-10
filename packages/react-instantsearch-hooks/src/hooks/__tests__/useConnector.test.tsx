@@ -12,25 +12,20 @@ import {
 } from '../../../../../test/mock';
 import {
   createInstantSearchTestWrapper,
-  createInstantSearchMock,
+  createInstantSearchSpy,
 } from '../../../../../test/utils';
 import { Index } from '../../components/Index';
 import { InstantSearch } from '../../components/InstantSearch';
 import { useHits } from '../../connectors/useHits';
 import { IndexContext } from '../../lib/IndexContext';
-import { InstantSearchContext } from '../../lib/InstantSearchContext';
 import { noop } from '../../lib/noop';
 import { useConnector } from '../useConnector';
 
-import type {
-  InstantSearch as InstantSearchType,
-  Connector,
-} from 'instantsearch.js';
+import type { Connector } from 'instantsearch.js';
 import type {
   HitsConnectorParams,
   HitsWidgetDescription,
 } from 'instantsearch.js/es/connectors/hits/connectHits';
-import type { IndexWidget } from 'instantsearch.js/es/widgets/index/index';
 
 type CustomSearchBoxWidgetDescription = {
   $$type: 'test.searchBox';
@@ -329,12 +324,12 @@ describe('useConnector', () => {
         getWidgetRenderState,
       });
     const searchClient = createSearchClient({});
-    let searchContext: InstantSearchType | null = null;
-    let indexContext: IndexWidget | null = null;
+    const { InstantSearchSpy, indexContext, searchContext } =
+      createInstantSearchSpy();
 
     function SearchProvider({ children }) {
       return (
-        <InstantSearch
+        <InstantSearchSpy
           searchClient={searchClient}
           indexName="indexName"
           initialUiState={{
@@ -343,22 +338,8 @@ describe('useConnector', () => {
             },
           }}
         >
-          <InstantSearchContext.Consumer>
-            {(searchContextValue) => {
-              searchContext = searchContextValue;
-
-              return (
-                <IndexContext.Consumer>
-                  {(indexContextValue) => {
-                    indexContext = indexContextValue;
-
-                    return children;
-                  }}
-                </IndexContext.Consumer>
-              );
-            }}
-          </InstantSearchContext.Consumer>
-        </InstantSearch>
+          {children}
+        </InstantSearchSpy>
       );
     }
 
@@ -385,8 +366,8 @@ describe('useConnector', () => {
       helper: expect.objectContaining({
         state: helperState,
       }),
-      parent: indexContext!,
-      instantSearchInstance: searchContext!,
+      parent: indexContext.current!,
+      instantSearchInstance: searchContext.current!,
       results: expect.objectContaining({
         hitsPerPage: 20,
         __isArtificial: true,
@@ -399,9 +380,9 @@ describe('useConnector', () => {
         },
       ],
       state: helperState,
-      renderState: searchContext!.renderState,
-      templatesConfig: searchContext!.templatesConfig,
-      createURL: indexContext!.createURL,
+      renderState: searchContext.current!.renderState,
+      templatesConfig: searchContext.current!.templatesConfig,
+      createURL: indexContext.current!.createURL,
       searchMetadata: {
         isSearchStalled: false,
       },
@@ -496,14 +477,14 @@ describe('useConnector', () => {
     Wrapper = ({ children }) => children,
   } = {}) {
     const searchClient = createSearchClient({});
-    const { InstantSearchMock, indexContext } = createInstantSearchMock();
+    const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
     function App() {
       return (
         <Wrapper>
-          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+          <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomSearchBox />
-          </InstantSearchMock>
+          </InstantSearchSpy>
         </Wrapper>
       );
     }
@@ -518,10 +499,10 @@ describe('useConnector', () => {
       ])
     );
 
-    // Step 2: we re-render the widget with the same props
+    // Step 2: we rerender the widget with the same props
     rerender(<App />);
 
-    // We re-rendered the widget with the same props so we shouldn't
+    // We rerendered the widget with the same props so we shouldn't
     // remove/add it again.
     expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(0);
     expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(1);
@@ -607,14 +588,14 @@ describe('useConnector', () => {
     Wrapper = ({ children }) => children,
   } = {}) {
     const searchClient = createSearchClient({});
-    const { InstantSearchMock, indexContext } = createInstantSearchMock();
+    const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
     function App({ attribute }) {
       return (
         <Wrapper>
-          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+          <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomWidget attribute={attribute} />
-          </InstantSearchMock>
+          </InstantSearchSpy>
         </Wrapper>
       );
     }
@@ -633,10 +614,10 @@ describe('useConnector', () => {
     expect(getByTestId('attribute')).toHaveTextContent('categories');
   }
 
-  test('re-renders the widget on prop change', async () => {
+  test('rerenders the widget on prop change', async () => {
     await testRerenderOnPropChange();
   });
-  test('[Strict Mode] re-renders the widget on prop change', async () => {
+  test('[Strict Mode] rerenders the widget on prop change', async () => {
     function Wrapper({ children }) {
       return <StrictMode>{children}</StrictMode>;
     }
@@ -647,19 +628,19 @@ describe('useConnector', () => {
     Wrapper = ({ children }) => children,
   } = {}) {
     const searchClient = createSearchClient({});
-    const { InstantSearchMock, indexContext } = createInstantSearchMock();
+    const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
     function App() {
       const [attribute, setAttribute] = useState('brands');
 
       return (
         <Wrapper>
-          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+          <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomWidget attribute={attribute} />
             <button onClick={() => setAttribute('categories')}>
               Change attribute
             </button>
-          </InstantSearchMock>
+          </InstantSearchSpy>
         </Wrapper>
       );
     }
@@ -679,10 +660,10 @@ describe('useConnector', () => {
     expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(2);
   }
 
-  test('re-renders the widget on state change', async () => {
+  test('rerenders the widget on state change', async () => {
     await testRerenderOnStateChange();
   });
-  test('[Strict Mode] re-renders the widget on state change', async () => {
+  test('[Strict Mode] rerenders the widget on state change', async () => {
     function Wrapper({ children }) {
       return <StrictMode>{children}</StrictMode>;
     }
@@ -693,14 +674,14 @@ describe('useConnector', () => {
     Wrapper = ({ children }) => children,
   } = {}) {
     const searchClient = createSearchClient({});
-    const { InstantSearchMock, indexContext } = createInstantSearchMock();
+    const { InstantSearchSpy, indexContext } = createInstantSearchSpy();
 
     function App({ callback }) {
       return (
         <Wrapper>
-          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+          <InstantSearchSpy searchClient={searchClient} indexName="indexName">
             <CustomWidget callback={callback} />
-          </InstantSearchMock>
+          </InstantSearchSpy>
         </Wrapper>
       );
     }
@@ -719,10 +700,10 @@ describe('useConnector', () => {
 
   // Ideally we would like to avoid this behavior, but we don't have any way
   // to memo function props, so they're always considered as new reference.
-  test('always removes/adds the widget on re-renders when using an unstable function prop', async () => {
+  test('always removes/adds the widget on rerenders when using an unstable function prop', async () => {
     await testRerenderWithUnstableFunctionProp();
   });
-  test('[Strict Mode] always removes/adds the widget on re-renders when using an unstable function prop', async () => {
+  test('[Strict Mode] always removes/adds the widget on rerenders when using an unstable function prop', async () => {
     function Wrapper({ children }) {
       return <StrictMode>{children}</StrictMode>;
     }

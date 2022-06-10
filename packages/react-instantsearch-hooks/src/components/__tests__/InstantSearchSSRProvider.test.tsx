@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { history } from 'instantsearch.js/es/lib/routers';
 import { simple } from 'instantsearch.js/es/lib/stateMappings';
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { Hits, RefinementList, SearchBox } from 'react-instantsearch-hooks-web';
 
 import { createSearchClient } from '../../../../../test/mock';
@@ -40,11 +40,13 @@ describe('InstantSearchSSRProvider', () => {
 
     function App() {
       return (
-        <InstantSearchSSRProvider initialResults={initialResults}>
-          <InstantSearch searchClient={searchClient} indexName="indexName">
-            <Hits hitComponent={Hit} />
-          </InstantSearch>
-        </InstantSearchSSRProvider>
+        <StrictMode>
+          <InstantSearchSSRProvider initialResults={initialResults}>
+            <InstantSearch searchClient={searchClient} indexName="indexName">
+              <Hits hitComponent={Hit} />
+            </InstantSearch>
+          </InstantSearchSSRProvider>
+        </StrictMode>
       );
     }
 
@@ -100,20 +102,22 @@ describe('InstantSearchSSRProvider', () => {
 
     function App() {
       return (
-        <InstantSearchSSRProvider initialResults={initialResults}>
-          <InstantSearch
-            searchClient={searchClient}
-            indexName="indexName"
-            initialUiState={{
-              indexName: {
-                query: 'iphone',
-              },
-            }}
-          >
-            <SearchBox />
-            <Hits hitComponent={Hit} />
-          </InstantSearch>
-        </InstantSearchSSRProvider>
+        <StrictMode>
+          <InstantSearchSSRProvider initialResults={initialResults}>
+            <InstantSearch
+              searchClient={searchClient}
+              indexName="indexName"
+              initialUiState={{
+                indexName: {
+                  query: 'iphone',
+                },
+              }}
+            >
+              <SearchBox />
+              <Hits hitComponent={Hit} />
+            </InstantSearch>
+          </InstantSearchSSRProvider>
+        </StrictMode>
       );
     }
 
@@ -159,16 +163,18 @@ describe('InstantSearchSSRProvider', () => {
 
     function App() {
       return (
-        <InstantSearchSSRProvider initialResults={initialResults}>
-          <InstantSearch
-            searchClient={searchClient}
-            indexName="indexName"
-            routing={routing}
-          >
-            <SearchBox />
-            <Hits hitComponent={Hit} />
-          </InstantSearch>
-        </InstantSearchSSRProvider>
+        <StrictMode>
+          <InstantSearchSSRProvider initialResults={initialResults}>
+            <InstantSearch
+              searchClient={searchClient}
+              indexName="indexName"
+              routing={routing}
+            >
+              <SearchBox />
+              <Hits hitComponent={Hit} />
+            </InstantSearch>
+          </InstantSearchSSRProvider>
+        </StrictMode>
       );
     }
 
@@ -251,11 +257,13 @@ describe('InstantSearchSSRProvider', () => {
 
     function App() {
       return (
-        <InstantSearchSSRProvider initialResults={initialResults}>
-          <InstantSearch searchClient={searchClient} indexName="indexName">
-            <RefinementList attribute="brand" />
-          </InstantSearch>
-        </InstantSearchSSRProvider>
+        <StrictMode>
+          <InstantSearchSSRProvider initialResults={initialResults}>
+            <InstantSearch searchClient={searchClient} indexName="indexName">
+              <RefinementList attribute="brand" />
+            </InstantSearch>
+          </InstantSearchSSRProvider>
+        </StrictMode>
       );
     }
 
@@ -274,14 +282,16 @@ describe('InstantSearchSSRProvider', () => {
 
     function App() {
       return (
-        <InstantSearchSSRProvider>
-          <InstantSearch searchClient={searchClient} indexName="indexName">
-            <main>
-              <h1>Search</h1>
-              <Hits hitComponent={Hit} />
-            </main>
-          </InstantSearch>
-        </InstantSearchSSRProvider>
+        <StrictMode>
+          <InstantSearchSSRProvider>
+            <InstantSearch searchClient={searchClient} indexName="indexName">
+              <main>
+                <h1>Search</h1>
+                <Hits hitComponent={Hit} />
+              </main>
+            </InstantSearch>
+          </InstantSearchSSRProvider>
+        </StrictMode>
       );
     }
 
@@ -330,11 +340,13 @@ describe('InstantSearchSSRProvider', () => {
 
     function App() {
       return (
-        <InstantSearchSSRProvider initialResults={initialResults}>
-          <InstantSearch searchClient={searchClient} indexName="indexName">
-            <Hits hitComponent={Hit} />
-          </InstantSearch>
-        </InstantSearchSSRProvider>
+        <StrictMode>
+          <InstantSearchSSRProvider initialResults={initialResults}>
+            <InstantSearch searchClient={searchClient} indexName="indexName">
+              <Hits hitComponent={Hit} />
+            </InstantSearch>
+          </InstantSearchSSRProvider>
+        </StrictMode>
       );
     }
 
@@ -345,7 +357,7 @@ describe('InstantSearchSSRProvider', () => {
     expect(searchClient.search).toHaveBeenCalledTimes(0);
   });
 
-  test('catches up with lifecycle on re-renders', async () => {
+  test('recovers the state on rerender', async () => {
     const searchClient = createSearchClient({});
     const initialResults = {
       indexName: {
@@ -370,11 +382,13 @@ describe('InstantSearchSSRProvider', () => {
 
     function App() {
       return (
-        <InstantSearchSSRProvider initialResults={initialResults}>
-          <InstantSearch searchClient={searchClient} indexName="indexName">
-            <SearchBox />
-          </InstantSearch>
-        </InstantSearchSSRProvider>
+        <StrictMode>
+          <InstantSearchSSRProvider initialResults={initialResults}>
+            <InstantSearch searchClient={searchClient} indexName="indexName">
+              <SearchBox />
+            </InstantSearch>
+          </InstantSearchSSRProvider>
+        </StrictMode>
       );
     }
 
