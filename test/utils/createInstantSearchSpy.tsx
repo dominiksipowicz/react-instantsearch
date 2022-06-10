@@ -4,10 +4,7 @@ import { InstantSearch } from '../../packages/react-instantsearch-hooks/src/comp
 import { IndexContext } from '../../packages/react-instantsearch-hooks/src/lib/IndexContext';
 import { InstantSearchContext } from '../../packages/react-instantsearch-hooks/src/lib/InstantSearchContext';
 import type { InstantSearchProps } from '../../packages/react-instantsearch-hooks/src';
-import type {
-  InstantSearch as InstantSearchType,
-  Widget,
-} from 'instantsearch.js';
+import type { InstantSearch as InstantSearchType } from 'instantsearch.js';
 import type { IndexWidget } from 'instantsearch.js/es/widgets/index/index';
 
 export function createInstantSearchSpy() {

@@ -7,6 +7,7 @@ import { useInstantSearchServerContext } from '../lib/useInstantSearchServerCont
 import { useForceUpdate } from './useForceUpdate';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useStableValue } from './useStableValue';
+import { useWidget } from './useWidget';
 
 import type { IndexWidgetParams } from 'instantsearch.js/es/widgets/index/index';
 
@@ -32,13 +33,7 @@ export function useIndex(props: UseIndexProps) {
     forceUpdate();
   }, [helper, forceUpdate]);
 
-  useIsomorphicLayoutEffect(() => {
-    parentIndex.addWidgets([indexWidget]);
-
-    return () => {
-      parentIndex.removeWidgets([indexWidget]);
-    };
-  }, [parentIndex, indexWidget]);
+  useWidget(indexWidget, parentIndex, stableProps);
 
   // On the server, we directly add the Index widget early to retrieve it's child
   // widgets' search parameters in the render pass.
