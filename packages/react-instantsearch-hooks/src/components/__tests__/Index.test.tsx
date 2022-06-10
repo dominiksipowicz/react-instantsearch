@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react';
-import React, { createRef } from 'react';
+import { render, waitFor } from '@testing-library/react';
+import React, { createRef, StrictMode } from 'react';
 
 import { createSearchClient } from '../../../../../test/mock';
 import { Configure } from '../../components/Configure';
@@ -10,6 +10,7 @@ import { InstantSearch } from '../InstantSearch';
 import { InstantSearchSSRProvider } from '../InstantSearchSSRProvider';
 
 import type { IndexWidget } from 'instantsearch.js/es/widgets/index/index';
+import { wait } from '@testing-library/user-event/dist/utils';
 
 describe('Index', () => {
   test('throws when used outside of <InstantSearch>', () => {
@@ -95,6 +96,50 @@ describe('Index', () => {
       })
     );
     expect(indexContext!.getIndexName()).toEqual('subchildIndex');
+  });
+
+  test('triggers only one search with nested indices', async () => {
+    const searchClient = createSearchClient({});
+
+    render(
+      <InstantSearch indexName="indexName" searchClient={searchClient}>
+        <Index indexName="childIndex">
+          <Index indexName="subchildIndex" />
+        </Index>
+      </InstantSearch>
+    );
+
+    // @TODO: this is not failing with `useEffect()`
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+
+    expect(searchClient.search).toHaveBeenCalledWith([
+      expect.objectContaining({ indexName: 'indexName' }),
+      expect.objectContaining({ indexName: 'childIndex' }),
+      expect.objectContaining({ indexName: 'subchildIndex' }),
+    ]);
+  });
+
+  test('triggers only one search with nested indices in Strict Mode', async () => {
+    const searchClient = createSearchClient({});
+
+    render(
+      <StrictMode>
+        <InstantSearch indexName="indexName" searchClient={searchClient}>
+          <Index indexName="childIndex">
+            <Index indexName="subchildIndex" />
+          </Index>
+        </InstantSearch>
+      </StrictMode>
+    );
+
+    // @TODO: this is not failing with `useEffect()`
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+
+    expect(searchClient.search).toHaveBeenCalledWith([
+      expect.objectContaining({ indexName: 'indexName' }),
+      expect.objectContaining({ indexName: 'childIndex' }),
+      expect.objectContaining({ indexName: 'subchildIndex' }),
+    ]);
   });
 
   test('adds the index only once on CSR', () => {
