@@ -1,8 +1,10 @@
+/* eslint-disable jest/expect-expect */
+
 import { render, waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 import { SearchParameters, SearchResults } from 'algoliasearch-helper';
 import connectHits from 'instantsearch.js/es/connectors/hits/connectHits';
-import React, { useState } from 'react';
+import React, { StrictMode, useState } from 'react';
 
 import {
   createSearchClient,
@@ -10,7 +12,7 @@ import {
 } from '../../../../../test/mock';
 import {
   createInstantSearchTestWrapper,
-  wait,
+  createInstantSearchMock,
 } from '../../../../../test/utils';
 import { Index } from '../../components/Index';
 import { InstantSearch } from '../../components/InstantSearch';
@@ -40,7 +42,7 @@ type CustomSearchBoxWidgetDescription = {
 
 const connectCustomSearchBox: Connector<
   CustomSearchBoxWidgetDescription,
-  Record<string, never>
+  Record<string, any>
 > =
   (renderFn, unmountFn = noop) =>
   (widgetParams) => {
@@ -90,6 +92,14 @@ const connectCustomSearchBox: Connector<
       },
     };
   };
+
+function CustomSearchBox(props: Record<string, any>) {
+  useConnector<Record<never, never>, CustomSearchBoxWidgetDescription>(
+    connectCustomSearchBox,
+    props
+  );
+  return null;
+}
 
 const connectCustomSearchBoxWithoutRenderState: Connector<
   CustomSearchBoxWidgetDescription,
@@ -187,9 +197,7 @@ const connectUnstableSearchBox: Connector<
     };
   };
 
-type CustomWidgetParams = {
-  attribute: string;
-};
+type CustomWidgetParams = Record<string, any>;
 
 type CustomWidgetDescription = {
   $$type: 'test.customWidget';
@@ -411,7 +419,7 @@ describe('useConnector', () => {
       );
     }
 
-    function CustomWidget() {
+    function CustomHitsWidget() {
       const state = useConnector<HitsConnectorParams, HitsWidgetDescription>(
         connectHits
       );
@@ -421,7 +429,7 @@ describe('useConnector', () => {
 
     const { container } = render(
       <SearchProvider>
-        <CustomWidget />
+        <CustomHitsWidget />
       </SearchProvider>
     );
 
@@ -463,7 +471,7 @@ describe('useConnector', () => {
       );
     }
 
-    function CustomWidget() {
+    function CustomHitsWidget() {
       const state = useConnector<HitsConnectorParams, HitsWidgetDescription>(
         connectHits
       );
@@ -473,7 +481,7 @@ describe('useConnector', () => {
 
     const { container } = render(
       <SearchProvider>
-        <CustomWidget />
+        <CustomHitsWidget />
       </SearchProvider>
     );
 
@@ -484,74 +492,67 @@ describe('useConnector', () => {
     `);
   });
 
-  test('adds the widget to the parent index', async () => {
+  async function runWidgetLifecycleTest({
+    Wrapper = ({ children }) => children,
+  } = {}) {
     const searchClient = createSearchClient({});
-    let indexContext: IndexWidget | null = null;
+    const { InstantSearchMock, indexContext } = createInstantSearchMock();
 
-    function CustomSearchBox() {
-      useConnector<Record<never, never>, CustomSearchBoxWidgetDescription>(
-        connectCustomSearchBox,
-        {},
-        { $$widgetType: 'test.customSearchBox' }
-      );
-
-      return null;
-    }
-
-    function InstantSearchMock({ children }) {
+    function App() {
       return (
-        <InstantSearch searchClient={searchClient} indexName="indexName">
-          <IndexContext.Consumer>
-            {(value) => {
-              indexContext = {
-                ...value!,
-                addWidgets: jest.fn(),
-                removeWidgets: jest.fn(),
-              };
-
-              return (
-                <IndexContext.Provider value={indexContext}>
-                  {children}
-                </IndexContext.Provider>
-              );
-            }}
-          </IndexContext.Consumer>
-        </InstantSearch>
+        <Wrapper>
+          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+            <CustomSearchBox />
+          </InstantSearchMock>
+        </Wrapper>
       );
     }
 
-    const { unmount } = render(
-      <InstantSearchMock>
-        <CustomSearchBox />
-      </InstantSearchMock>
-    );
+    // Step 1: we render the widget for the first time.
+    const { unmount, rerender } = render(<App />);
 
-    expect(indexContext!.addWidgets).toHaveBeenCalledTimes(1);
-    expect(indexContext!.addWidgets).toHaveBeenLastCalledWith(
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(1);
+    expect(indexContext.current!.addWidgets).toHaveBeenLastCalledWith(
       expect.arrayContaining([
-        expect.objectContaining({
-          $$type: 'test.searchBox',
-          $$widgetType: 'test.customSearchBox',
-        }),
+        expect.objectContaining({ $$type: 'test.searchBox' }),
       ])
     );
 
+    // Step 2: we re-render the widget with the same props
+    rerender(<App />);
+
+    // We re-rendered the widget with the same props so we shouldn't
+    // remove/add it again.
+    expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(0);
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(1);
+
+    // Step 3: we unmount the widget.
     unmount();
 
     await waitFor(() =>
-      expect(indexContext!.removeWidgets).toHaveBeenCalledTimes(1)
+      expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(1)
     );
-    expect(indexContext!.removeWidgets).toHaveBeenLastCalledWith(
+    expect(indexContext.current!.removeWidgets).toHaveBeenLastCalledWith(
       expect.arrayContaining([
-        expect.objectContaining({
-          $$type: 'test.searchBox',
-          $$widgetType: 'test.customSearchBox',
-        }),
+        expect.objectContaining({ $$type: 'test.searchBox' }),
       ])
     );
+    expect(indexContext.current!.getWidgets()).toEqual([]);
+  }
+
+  test('runs the widget lifecycle', async () => {
+    await runWidgetLifecycleTest();
+  });
+  test('[Strict Mode] runs the widget lifecycle', async () => {
+    function Wrapper({ children }) {
+      return <StrictMode>{children}</StrictMode>;
+    }
+    await runWidgetLifecycleTest({ Wrapper });
   });
 
-  test('limits the number of renders with unstable function references from render state', async () => {
+  async function testRenderCountWithUnstableFunctionFromRenderState({
+    Wrapper = ({ children }) => children,
+  } = {}) {
     const searchClient = createSearchClient({});
 
     function Hits(props) {
@@ -574,64 +575,92 @@ describe('useConnector', () => {
 
     function App() {
       return (
-        <InstantSearch searchClient={searchClient} indexName="indexName">
-          <Search />
-        </InstantSearch>
+        <Wrapper>
+          <InstantSearch searchClient={searchClient} indexName="indexName">
+            <Search />
+          </InstantSearch>
+        </Wrapper>
       );
     }
 
     render(<App />);
 
-    await wait(0);
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+  }
 
-    expect(searchClient.search).toHaveBeenCalledTimes(1);
+  test('limits the number of renders with unstable function references from render state', async () => {
+    await testRenderCountWithUnstableFunctionFromRenderState();
+  });
+  test('[Strict Mode] limits the number of renders with unstable function references from render state', async () => {
+    function Wrapper({ children }) {
+      return <StrictMode>{children}</StrictMode>;
+    }
+    await testRenderCountWithUnstableFunctionFromRenderState({ Wrapper });
   });
 
-  test('re-renders the widget on prop change', async () => {
-    const searchClient = createSearchClient({});
+  function CustomWidget(props: CustomWidgetParams) {
+    useConnector(connectCustomWidget, props);
+    return <div data-testid="attribute">{props.attribute}</div>;
+  }
 
-    function CustomWidget(props: CustomWidgetParams) {
-      useConnector(connectCustomWidget, props);
-      return <div data-testid="attribute">{props.attribute}</div>;
-    }
+  async function testRerenderOnPropChange({
+    Wrapper = ({ children }) => children,
+  } = {}) {
+    const searchClient = createSearchClient({});
+    const { InstantSearchMock, indexContext } = createInstantSearchMock();
 
     function App({ attribute }) {
       return (
-        <InstantSearch searchClient={searchClient} indexName="indexName">
-          <CustomWidget attribute={attribute} />
-        </InstantSearch>
+        <Wrapper>
+          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+            <CustomWidget attribute={attribute} />
+          </InstantSearchMock>
+        </Wrapper>
       );
     }
 
     const { rerender, getByTestId } = render(<App attribute="brands" />);
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(1);
     expect(getByTestId('attribute')).toHaveTextContent('brands');
 
     rerender(<App attribute="categories" />);
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
+    expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(1);
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(2);
     expect(getByTestId('attribute')).toHaveTextContent('categories');
+  }
+
+  test('re-renders the widget on prop change', async () => {
+    await testRerenderOnPropChange();
+  });
+  test('[Strict Mode] re-renders the widget on prop change', async () => {
+    function Wrapper({ children }) {
+      return <StrictMode>{children}</StrictMode>;
+    }
+    await testRerenderOnPropChange({ Wrapper });
   });
 
-  test('re-renders the widget on state change', async () => {
+  async function testRerenderOnStateChange({
+    Wrapper = ({ children }) => children,
+  } = {}) {
     const searchClient = createSearchClient({});
-
-    function CustomWidget(props: CustomWidgetParams) {
-      useConnector(connectCustomWidget, props);
-      return <div data-testid="attribute">{props.attribute}</div>;
-    }
+    const { InstantSearchMock, indexContext } = createInstantSearchMock();
 
     function App() {
       const [attribute, setAttribute] = useState('brands');
 
       return (
-        <InstantSearch searchClient={searchClient} indexName="indexName">
-          <CustomWidget attribute={attribute} />
-          <button onClick={() => setAttribute('categories')}>
-            Change attribute
-          </button>
-        </InstantSearch>
+        <Wrapper>
+          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+            <CustomWidget attribute={attribute} />
+            <button onClick={() => setAttribute('categories')}>
+              Change attribute
+            </button>
+          </InstantSearchMock>
+        </Wrapper>
       );
     }
 
@@ -640,18 +669,63 @@ describe('useConnector', () => {
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
     expect(getByTestId('attribute')).toHaveTextContent('brands');
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(1);
 
     button.click();
 
     await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
     expect(getByTestId('attribute')).toHaveTextContent('categories');
+    expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(1);
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(2);
+  }
+
+  test('re-renders the widget on state change', async () => {
+    await testRerenderOnStateChange();
+  });
+  test('[Strict Mode] re-renders the widget on state change', async () => {
+    function Wrapper({ children }) {
+      return <StrictMode>{children}</StrictMode>;
+    }
+    await testRerenderOnStateChange({ Wrapper });
   });
 
-  test.todo('add the widget only once on re-renders');
-  test.todo('removes/adds the widget when widget props change');
+  async function testRerenderWithUnstableFunctionProp({
+    Wrapper = ({ children }) => children,
+  } = {}) {
+    const searchClient = createSearchClient({});
+    const { InstantSearchMock, indexContext } = createInstantSearchMock();
+
+    function App({ callback }) {
+      return (
+        <Wrapper>
+          <InstantSearchMock searchClient={searchClient} indexName="indexName">
+            <CustomWidget callback={callback} />
+          </InstantSearchMock>
+        </Wrapper>
+      );
+    }
+
+    const { rerender } = render(<App callback={() => {}} />);
+
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(1));
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(1);
+
+    rerender(<App callback={() => {}} />);
+
+    await waitFor(() => expect(searchClient.search).toHaveBeenCalledTimes(2));
+    expect(indexContext.current!.removeWidgets).toHaveBeenCalledTimes(1);
+    expect(indexContext.current!.addWidgets).toHaveBeenCalledTimes(2);
+  }
+
   // Ideally we would like to avoid this behavior, but we don't have any way
   // to memo function props, so they're always considered as new reference.
-  test.todo(
-    'always removes/adds the widget on re-renders when using an unstable function prop'
-  );
+  test('always removes/adds the widget on re-renders when using an unstable function prop', async () => {
+    await testRerenderWithUnstableFunctionProp();
+  });
+  test('[Strict Mode] always removes/adds the widget on re-renders when using an unstable function prop', async () => {
+    function Wrapper({ children }) {
+      return <StrictMode>{children}</StrictMode>;
+    }
+    await testRerenderWithUnstableFunctionProp({ Wrapper });
+  });
 });
